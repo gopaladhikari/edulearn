@@ -5,6 +5,9 @@ import { ApiError } from "./utils/api-responses.js";
 import morgan from "morgan";
 import { errorHandler } from "./middlewares/error-handler.middleware.js";
 import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
+import hpp from "hpp";
 
 const app = express();
 
@@ -22,10 +25,16 @@ app.use(
   })
 );
 
+// Helmet
+
+app.use(helmet());
+
 // Body parser
 
 app.use(express.json({ limit: "10kb" }));
+app.use(mongoSanitize());
 app.use(express.urlencoded({ limit: "10kb", extended: true }));
+app.use(hpp());
 app.use(cookieParser());
 app.use(express.static("public"));
 app.use(
