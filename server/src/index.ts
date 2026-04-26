@@ -1,9 +1,10 @@
 import { app } from "./app.js";
-import { connectToDb } from "./utils/connect-to-db.js";
+import { dbConnection } from "./utils/connect-to-db.js";
 
 const port = process.env.PORT;
 
-connectToDb()
+dbConnection
+  .connect()
   .then(() => {
     app.listen(port, () => {
       console.log(`Server is running in the port ${port}`);
