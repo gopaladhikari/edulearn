@@ -4,8 +4,23 @@ import cookieParser from "cookie-parser";
 import { ApiError } from "./utils/api-responses.js";
 import morgan from "morgan";
 import { errorHandler } from "./middlewares/error-handler.middleware.js";
+import rateLimit from "express-rate-limit";
 
 const app = express();
+
+// Rate limiting
+
+app.use(
+  "/api",
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+    message: "Too many request from this IP address, please try again later.",
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    ipv6Subnet: 56,
+  })
+);
 
 // Body parser
 
