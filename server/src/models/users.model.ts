@@ -14,7 +14,8 @@ const refreshTokenExpiry = process.env.REFRESH_TOKEN_EXPIRY;
 const userSchema = new Schema<IUsers>(
   {
     avatar: {
-      type: String,
+      type: String,w
+      default: "",
     },
 
     username: {
@@ -42,11 +43,26 @@ const userSchema = new Schema<IUsers>(
     firstName: {
       type: String,
       required: [true, "First name is required."],
+      minLength: [3, "Your first name should be between 3 and 16 characters."],
+      maxLength: [16, "Your first name should be between 3 and 16 characters."],
     },
 
     lastName: {
       type: String,
+      minLength: [
+        3,
+        "Your last name name should be between 3 and 16 characters.",
+      ],
+      maxLength: [
+        16,
+        "Your last name name should be between 3 and 16 characters.",
+      ],
       required: [true, "Last name is required."],
+    },
+
+    bio: {
+      type: String,
+      maxLength: [200, "Bio should be max 200 characters."],
     },
 
     email: {
@@ -55,10 +71,16 @@ const userSchema = new Schema<IUsers>(
       unique: [true, "This email is taken, Try another."],
       trim: true,
       index: true,
+      match: [
+        /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g,
+        "Please provide a valid email address",
+      ],
     },
 
     password: {
       type: String,
+      minLength: [8, "Password must be at least 8 characters."],
+      select: false,
       required: [true, "Please provide a password."],
     },
 

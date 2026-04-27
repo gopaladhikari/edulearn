@@ -13,6 +13,7 @@ export interface IUsers extends Document {
   refreshToken: string;
   accessToken: string;
   dateOfBirth: Date;
+  bio: string;
   forgotPasswordToken: string | undefined;
   fogotPasswordExpires: Date | undefined;
   emailVerificationToken: string | undefined;
