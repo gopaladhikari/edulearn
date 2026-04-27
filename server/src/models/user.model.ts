@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import { Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import jwt, { type SignOptions } from "jsonwebtoken";
@@ -14,7 +14,7 @@ const refreshTokenExpiry = process.env.REFRESH_TOKEN_EXPIRY;
 const userSchema = new Schema<IUsers>(
   {
     avatar: {
-      type: String,w
+      type: String,
       default: "",
     },
 
@@ -167,4 +167,4 @@ userSchema.methods.generateToken = function () {
   };
 };
 
-export const User = mongoose.model("User", userSchema);
+export const User = model("User", userSchema);

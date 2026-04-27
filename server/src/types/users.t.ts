@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import type { Document } from "mongoose";
 import type { UserRoles } from "../utils/constants.js";
 
 export interface IUsers extends Document {
