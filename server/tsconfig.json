@@ -19,6 +19,12 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
 
+    // path
+
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     // Style Options
     "noImplicitReturns": true,
     "noImplicitOverride": true,

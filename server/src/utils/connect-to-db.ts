@@ -32,7 +32,7 @@ class DatabaseConnection {
     process.on("SIGINT", () => this.handleAppTermination("SIGINT"));
   }
 
-  public async connect() {
+  async connect() {
     try {
       const connectionOptions: mongoose.ConnectOptions = {
         maxPoolSize: 10,
