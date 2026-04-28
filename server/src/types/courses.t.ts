@@ -1,10 +1,18 @@
-import type mongoose from "mongoose";
-import type { Document } from "mongoose";
+import type { Courselevels } from "@/utils/constants.js";
+import type { Document, HydratedDocument, Types } from "mongoose";
+import type { ILectures } from "./lectures.t.js";
 
 export interface ICourses extends Document {
   title: string;
   description: string;
-  videoUrl: string;
+  thumbnail: string;
   price: number;
-  instrctors: mongoose.Types.ObjectId[]; // user
+  instructorId: Types.ObjectId[]; // user
+  lectures: HydratedDocument<ILectures>;
+  isPublished: boolean;
+  language: string;
+  category: string;
+  duration: number;
+  subtitle?: string;
+  level: Courselevels;
 }

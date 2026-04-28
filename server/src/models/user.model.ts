@@ -6,8 +6,7 @@ import type { IUsers } from "@/types/users.t.js";
 import { UserRoles } from "@/utils/constants.js";
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string;
-const accessTokenExpiry = process.env
-  .ACCESS_TOKEN_EXPIRY as SignOptions["expiresIn"];
+const accessTokenExpiry = process.env.ACCESS_TOKEN_EXPIRY;
 const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET as string;
 const refreshTokenExpiry = process.env.REFRESH_TOKEN_EXPIRY;
 

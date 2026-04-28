@@ -5,3 +5,17 @@ export enum UserRoles {
   INSTRUCTOR = "instuctor",
   STUDENT = "student",
 }
+
+export enum Courselevels {
+  BEGINNER = "beginner",
+  INTERMEDIATE = "intermediate",
+  ADVANCED = "advanced",
+}
+
+export enum Rating {
+  ONE = 1,
+  TWO,
+  THREE,
+  FOUR,
+  FIVE,
+}
