@@ -19,3 +19,10 @@ export enum Rating {
   FOUR,
   FIVE,
 }
+
+export enum paymentStatus {
+  PENDING = "pending",
+  COMPLETED = "completed",
+  FAILED = "failed",
+  REFUNDED = "refunded",
+}

@@ -3,6 +3,8 @@ import { dbConnection } from "./utils/connect-to-db.js";
 
 const port = process.env.PORT;
 
+console.log("Hello World.");
+
 dbConnection
   .connect()
   .then(() => {
@@ -11,6 +13,6 @@ dbConnection
     });
   })
   .catch(() => {
-    console.error("database connection failed");
+    console.error("Database connection failed");
     process.exit(1);
   });

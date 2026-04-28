@@ -1,5 +1,5 @@
 import type { ILectures } from "@/types/lectures.t.js";
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 
 const lectureSchema = new Schema<ILectures>(
   {
@@ -8,6 +8,11 @@ const lectureSchema = new Schema<ILectures>(
       required: [true, "Lecture title is required."],
       trim: true,
       maxLength: [100, "Lecture title cannot exceed 100 characterss."],
+    },
+
+    courseId: {
+      type: Types.ObjectId,
+      ref: "Course",
     },
 
     description: {
@@ -21,6 +26,10 @@ const lectureSchema = new Schema<ILectures>(
       type: Number,
       min: [0, "Duration cannot be negative number."],
       default: 0,
+    },
+    videoUrl: {
+      type: String,
+      required: [true, "Video url id is required."],
     },
 
     videoPublicId: {

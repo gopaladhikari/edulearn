@@ -1,8 +1,18 @@
+import type { paymentStatus } from "@/utils/constants.js";
 import type { Document, Types } from "mongoose";
 
 export interface ICourseEnrollment extends Document {
   courseId: Types.ObjectId;
   userId: Types.ObjectId;
-  status: "active" | "completed" | "refunded";
   enrolledDate: Date;
+  amount: number;
+  currency: string;
+  status: paymentStatus;
+  paymentMethod: string;
+  paymentId: string;
+  refundId: string;
+  refundAmount: number;
+  refundReason: string;
+  metadata: Map<string, string>;
+  processRefund: (reason: string, amount: number) => void;
 }

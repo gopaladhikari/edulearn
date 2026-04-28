@@ -1,7 +1,18 @@
 import type { Document, Types } from "mongoose";
 
+interface ILectureProgress extends Document {
+  lectureId: Types.ObjectId;
+  isCompleted: boolean;
+  lastWatch: Date;
+  watchTime: number;
+}
+
 export interface ICourseProgress extends Document {
-  enrollmentId: Types.ObjectId;
-  completedLecturesId: Types.ObjectId[];
-  lastWatched: Types.ObjectId;
+  userId: Types.ObjectId;
+  courseId: Types.ObjectId;
+  isCompleted: boolean;
+  lastWatch: Date;
+  watchTime: number;
+  completionPercentage: number;
+  lectureProgress: ILectureProgress[];
 }
