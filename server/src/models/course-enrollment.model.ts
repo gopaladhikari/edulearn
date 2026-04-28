@@ -7,16 +7,13 @@ const courseEnrollmentSchema = new Schema<ICourseEnrollment>(
     courseId: {
       type: Types.ObjectId,
       ref: "Course",
+      required: [true, "Course id is required."],
     },
 
     userId: {
       type: Types.ObjectId,
       ref: "User",
-    },
-
-    enrolledDate: {
-      type: Date,
-      default: Date.now,
+      required: [true, "User id is required."],
     },
 
     amount: {

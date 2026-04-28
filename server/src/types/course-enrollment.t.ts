@@ -4,7 +4,6 @@ import type { Document, Types } from "mongoose";
 export interface ICourseEnrollment extends Document {
   courseId: Types.ObjectId;
   userId: Types.ObjectId;
-  enrolledDate: Date;
   amount: number;
   currency: string;
   status: paymentStatus;
