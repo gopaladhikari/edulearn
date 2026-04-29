@@ -8,6 +8,8 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import hpp from "hpp";
+import passport from "passport";
+import { LocalLogin, LocalRegister } from "./strategy/local.strategy.js";
 
 const app = express();
 
@@ -24,6 +26,12 @@ app.use(
     ipv6Subnet: 56,
   })
 );
+
+// passport
+
+app.use(passport.initialize());
+LocalLogin(passport);
+LocalRegister(passport);
 
 // Helmet
 
