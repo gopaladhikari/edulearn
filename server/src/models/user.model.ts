@@ -48,14 +48,8 @@ const userSchema = new Schema<IUsers>(
 
     lastName: {
       type: String,
-      minLength: [
-        3,
-        "Your last name name should be between 3 and 16 characters.",
-      ],
-      maxLength: [
-        16,
-        "Your last name name should be between 3 and 16 characters.",
-      ],
+      minLength: [3, "Your last name should be between 3 and 16 characters."],
+      maxLength: [16, "Your last name should be between 3 and 16 characters."],
       required: [true, "Last name is required."],
     },
 
@@ -68,10 +62,11 @@ const userSchema = new Schema<IUsers>(
       type: String,
       required: [true, "Email is required."],
       unique: [true, "This email is taken, Try another."],
+      lowercase: true,
       trim: true,
       index: true,
       match: [
-        /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g,
+        /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
         "Please provide a valid email address",
       ],
     },
@@ -92,15 +87,11 @@ const userSchema = new Schema<IUsers>(
       type: String,
     },
 
-    accessToken: {
-      type: String,
-    },
-
     forgotPasswordToken: {
       type: String,
     },
 
-    fogotPasswordExpires: {
+    forgotPasswordExpires: {
       type: Date,
     },
     emailVerificationToken: {

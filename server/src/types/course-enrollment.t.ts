@@ -1,14 +1,14 @@
 import type { paymentStatus } from "@/utils/constants.js";
-import type { Document, Types } from "mongoose";
+import type { Types } from "mongoose";
 
-export interface ICourseEnrollment extends Document {
+export interface ICourseEnrollment {
   courseId: Types.ObjectId;
   userId: Types.ObjectId;
   amount: number;
   currency: string;
   status: paymentStatus;
   paymentMethod: string;
-  paymentId: string;
+  paymentId?: string;
   refundId: string;
   refundAmount: number;
   refundReason: string;

@@ -1,7 +1,6 @@
-import type { Document } from "mongoose";
 import type { UserRoles } from "../utils/constants.js";
 
-export interface IUsers extends Document {
+export interface IUsers {
   avatar: string;
   firstName: string;
   lastName: string;
@@ -11,11 +10,10 @@ export interface IUsers extends Document {
   role: UserRoles;
   isEmailVerified: boolean;
   refreshToken: string;
-  accessToken: string;
   dateOfBirth: Date;
   bio: string;
   forgotPasswordToken: string | undefined;
-  fogotPasswordExpires: Date | undefined;
+  forgotPasswordExpires: Date | undefined;
   emailVerificationToken: string | undefined;
   emailVerificationExpires: Date | undefined;
   generateAccessToken: () => string;

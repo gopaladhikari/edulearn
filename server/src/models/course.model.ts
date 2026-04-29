@@ -1,8 +1,13 @@
 import type { ICourses } from "@/types/courses.t.js";
 import { Courselevels } from "@/utils/constants.js";
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
 
-const courseSchema = new Schema<ICourses>(
+// @ts-ignore
+import sluggerPlugin from "mongoose-slug-update";
+
+mongoose.plugin(sluggerPlugin);
+
+const courseSchema = new mongoose.Schema<ICourses>(
   {
     title: {
       type: String,
@@ -11,17 +16,26 @@ const courseSchema = new Schema<ICourses>(
       maxLength: [100, "Course title cannot exceed 100 characters."],
     },
 
+    slug: {
+      type: String,
+      required: [true, "Course Slug is required."],
+      unique: true,
+      slug: "title",
+      slugPaddingSize: 4,
+      index: true,
+    },
+
     subtitle: {
       type: String,
       trim: true,
-      maxLength: [200, "Course description cannot exceed 100 characters."],
+      maxLength: [200, "Course description cannot exceed 200 characters."],
     },
 
     description: {
       type: String,
       required: [true, "Course description is required."],
       trim: true,
-      maxLength: [500, "Course description cannot exceed 100 characters."],
+      maxLength: [500, "Course description cannot exceed 500 characters."],
     },
 
     duration: {
@@ -48,7 +62,12 @@ const courseSchema = new Schema<ICourses>(
     price: {
       type: Number,
       required: [true, "Price is required."],
-      min: [0, "Course price cannot is negative number."],
+      min: [0, "Course price cannot be negative."],
+    },
+
+    language: {
+      type: String,
+      required: [true, "Course language is required."],
     },
 
     thumbnail: {
@@ -56,13 +75,21 @@ const courseSchema = new Schema<ICourses>(
       required: [true, "Course thumbnail is required."],
     },
 
-    instructorId: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: "User",
-        required: [true, "Course instructors are required."],
+    instructorId: {
+      type: [
+        {
+          type: mongoose.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      validate: {
+        validator(v) {
+          return Array.isArray(v) && v.length > 0;
+        },
+
+        message: "A course must have at least one instructor.",
       },
-    ],
+    },
 
     isPublished: {
       type: Boolean,
@@ -74,6 +101,6 @@ const courseSchema = new Schema<ICourses>(
   }
 );
 
-// TODO: Add reviews and rating in courses.
-
 export const Course = mongoose.model("Course", courseSchema);
+
+// TODO: Add averageRating, totalReviews,totalEnrollments

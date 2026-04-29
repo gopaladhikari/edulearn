@@ -1,5 +1,6 @@
 import type { ICourseProgress } from "@/types/course-progress.t.js";
 import { Schema, model, Types } from "mongoose";
+import { ApiError } from "@/utils/api-responses.js";
 
 const lectureProgress = new Schema<ICourseProgress["lectureProgress"][number]>(
   {
@@ -29,16 +30,10 @@ const lectureProgress = new Schema<ICourseProgress["lectureProgress"][number]>(
 
 const courseProgressSchema = new Schema<ICourseProgress>(
   {
-    userId: {
+    enrollmentId: {
       type: Types.ObjectId,
-      ref: "User",
-      required: [true, "User id is required."],
-    },
-
-    courseId: {
-      type: Types.ObjectId,
-      ref: "Course",
-      required: [true, "Course id is required."],
+      ref: "CourseEnrollment",
+      required: [true, "Enrollment id is required."],
     },
 
     lectureProgress: [lectureProgress],
@@ -51,6 +46,7 @@ const courseProgressSchema = new Schema<ICourseProgress>(
     watchTime: {
       type: Number,
       default: 0,
+      min: [0, "Watch time shouldn't be negative."],
     },
 
     lastWatch: {
@@ -68,7 +64,39 @@ const courseProgressSchema = new Schema<ICourseProgress>(
   { timestamps: true }
 );
 
-// one progress document per user per course
-courseProgressSchema.index({ userId: 1, courseId: 1 }, { unique: true });
+// one progress per enrollment
+
+courseProgressSchema.pre("save", async function () {
+  const courseEnrollment = await model("CourseEnrollment")
+    .findById(this.enrollmentId)
+    .select("courseId");
+
+  if (!courseEnrollment)
+    throw new ApiError(404, "No course exist for this enrollment.");
+
+  const totalLectures = await model("Lecture").countDocuments({
+    courseId: courseEnrollment.courseId,
+  });
+
+  if (totalLectures === 0) {
+    this.completionPercentage = 0;
+    this.isCompleted = false;
+  } else {
+    const completedLectures = this.lectureProgress.filter(
+      (lecture) => lecture.isCompleted
+    ).length;
+
+    const completionPercentage = Math.round(
+      (completedLectures / totalLectures) * 100
+    );
+
+    if (completionPercentage === 100)
+      this.isCompleted = completionPercentage === 100;
+
+    this.completionPercentage = completionPercentage;
+  }
+});
+
+courseProgressSchema.index({ enrollmentId: 1 }, { unique: true });
 
 export const CourseProgress = model("CourseProgress", courseProgressSchema);

@@ -1,15 +1,15 @@
-import type { Document, Types } from "mongoose";
+import type { Types } from "mongoose";
 
-interface ILectureProgress extends Document {
+interface ILectureProgress {
   lectureId: Types.ObjectId;
   isCompleted: boolean;
   lastWatch: Date;
   watchTime: number;
 }
 
-export interface ICourseProgress extends Document {
-  userId: Types.ObjectId;
-  courseId: Types.ObjectId;
+export interface ICourseProgress {
+  enrollmentId: Types.ObjectId;
+  // courseId: Types.ObjectId;
   isCompleted: boolean;
   lastWatch: Date;
   watchTime: number;

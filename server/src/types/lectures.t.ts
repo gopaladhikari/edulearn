@@ -1,7 +1,6 @@
-import type { Document } from "mongoose";
 import type mongoose from "mongoose";
 
-export interface ILectures extends Document {
+export interface ILectures {
   title: string;
   description: string;
   courseId: mongoose.Types.ObjectId; // Course ;

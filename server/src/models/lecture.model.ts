@@ -7,26 +7,29 @@ const lectureSchema = new Schema<ILectures>(
       type: String,
       required: [true, "Lecture title is required."],
       trim: true,
-      maxLength: [100, "Lecture title cannot exceed 100 characterss."],
+      maxLength: [100, "Lecture title cannot exceed 100 characters."],
     },
 
     courseId: {
       type: Types.ObjectId,
       ref: "Course",
+      required: [true, "Course id is required."],
     },
 
     description: {
       type: String,
       required: [true, "Lecture description is required."],
       trim: true,
-      maxLength: [500, "Lecture description cannot exceed 100 characterss."],
+      maxLength: [500, "Lecture description cannot exceed 100 characters."],
     },
 
     duration: {
       type: Number,
+      required: [true, "Duration of a lecture is required."],
       min: [0, "Duration cannot be negative number."],
       default: 0,
     },
+
     videoUrl: {
       type: String,
       required: [true, "Video url id is required."],
@@ -39,7 +42,7 @@ const lectureSchema = new Schema<ILectures>(
 
     isPreview: {
       type: Boolean,
-      default: true,
+      default: false,
     },
 
     order: {
@@ -49,5 +52,7 @@ const lectureSchema = new Schema<ILectures>(
   },
   { timestamps: true }
 );
+
+lectureSchema.index({ courseId: 1, order: 1 }, { unique: true });
 
 export const Lecture = model("Lecture", lectureSchema);

@@ -2,7 +2,7 @@ export const appName = "edulearn";
 
 export enum UserRoles {
   ADMIN = "admin",
-  INSTRUCTOR = "instuctor",
+  INSTRUCTOR = "instructor",
   STUDENT = "student",
 }
 
@@ -25,4 +25,10 @@ export enum paymentStatus {
   COMPLETED = "completed",
   FAILED = "failed",
   REFUNDED = "refunded",
+}
+
+export enum paymentMethods {
+  STRIPE = "stripe",
+  RAZORPAY = "razorpay",
+  FREE = "free",
 }

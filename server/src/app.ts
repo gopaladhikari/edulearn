@@ -58,8 +58,8 @@ app.use(
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
 // 404
-app.use((_req, res) => {
-  res.status(404).json(new ApiError(404, "Api route not found"));
+app.use((req, _res, next) => {
+  next(new ApiError(404, `Api route not found: ${req.originalUrl}`));
 });
 
 // Error Middleware
