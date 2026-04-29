@@ -35,22 +35,22 @@ export const registerUser = async (req: Request, res: Response) => {
 
   if (existingUser) throw new ApiError(400, "User already exists");
 
-  const newUser = await User.create({
+  const user = await User.create({
     username,
     email,
     password,
   });
 
-  if (!newUser) throw new ApiError(400, "Something went wrong");
+  if (!user) throw new ApiError(400, "Something went wrong");
 
-  const { hashToken, tokenExpiry, unhashedToken } = newUser.generateToken();
+  const { hashToken, tokenExpiry, unhashedToken } = user.generateToken();
 
-  generateAccessAndRefreshTokens(newUser);
+  generateAccessAndRefreshTokens(user);
 
-  newUser.emailVerificationToken = hashToken;
-  newUser.emailVerificationExpires = new Date(tokenExpiry);
+  user.emailVerificationToken = hashToken;
+  user.emailVerificationExpires = new Date(tokenExpiry);
 
-  await newUser.save();
+  await user.save();
 
   // const content = emailVerificationEmailTemplate(
   //   `${siteUrl}/verify-email?token=${unhashedToken}`,
@@ -59,31 +59,15 @@ export const registerUser = async (req: Request, res: Response) => {
 
   // await sendEmail(content, newUser.email, "Verify your email");
 
-  const user = await User.findById(newUser._id).select(
-    "-password -refreshToken -emailVerificationToken -emailVerificationExpires"
-  );
-
   return res.status(201).json(new ApiResponse(201, "User created", { user }));
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-
-  const user = await User.findOne({ email });
-
-  if (!user) throw new ApiError(400, "User not found");
-
-  const isPasswordValid = await user.isPasswordValid(password);
-
-  if (!isPasswordValid) throw new ApiError(400, "Invalid email or password.");
+  const user = req.user!;
 
   const { accessToken, refreshToken } = generateAccessAndRefreshTokens(user);
 
   await user.save();
-
-  const loggedInUser = await User.findById(user._id).select(
-    "-password -accessToken -refreshToken -emailVerificationToken -emailVerificationExpires"
-  );
 
   return res
     .status(200)
@@ -91,7 +75,7 @@ export const loginUser = async (req: Request, res: Response) => {
     .cookie("refreshToken", refreshToken, cookiesOptions)
     .json(
       new ApiResponse(200, "User logged in successfully", {
-        user: loggedInUser,
+        user,
         accessToken,
         refreshToken,
       })

@@ -31,7 +31,12 @@ authRouter
 
 authRouter
   .route("/login")
-  .post(userLoginValidator(), validateRequest, loginUser);
+  .post(
+    userLoginValidator(),
+    validateRequest,
+    passport.authenticate("local", { session: false }),
+    loginUser
+  );
 
 authRouter.route("/logout").post(verifyJwt, logoutUser);
 

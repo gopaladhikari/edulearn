@@ -85,21 +85,26 @@ const userSchema = new Schema<IUsers>(
 
     refreshToken: {
       type: String,
+      select: false,
     },
 
     forgotPasswordToken: {
       type: String,
+      select: false,
     },
 
     forgotPasswordExpires: {
       type: Date,
+      select: false,
     },
     emailVerificationToken: {
       type: String,
+      select: false,
     },
 
     emailVerificationExpires: {
       type: Date,
+      select: false,
     },
   },
   {
