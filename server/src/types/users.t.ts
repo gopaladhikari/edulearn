@@ -20,7 +20,7 @@ export interface IUsers {
   generateRefreshToken: () => string;
   generateToken: () => {
     hashToken: string;
-    unhashToken: string;
+    unhashedToken: string;
     tokenExpiry: number;
   };
   isPasswordValid(password: string): Promise<boolean>;

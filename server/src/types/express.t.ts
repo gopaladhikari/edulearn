@@ -3,8 +3,6 @@ import type { IUsers } from "./users.t.js";
 
 declare global {
   namespace Express {
-    interface Request {
-      user?: HydratedDocument<IUsers>;
-    }
+    interface User extends HydratedDocument<IUsers> {}
   }
 }

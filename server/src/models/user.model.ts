@@ -119,11 +119,7 @@ userSchema.methods.isPasswordValid = async function (password: string) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-  const payload = {
-    _id: this._id,
-    username: this.username,
-    email: this.email,
-  };
+  const payload = { sub: this._id };
 
   return jwt.sign(payload, accessTokenSecret, {
     expiresIn: accessTokenExpiry as NonNullable<SignOptions["expiresIn"]>,
@@ -131,9 +127,7 @@ userSchema.methods.generateAccessToken = function () {
 };
 
 userSchema.methods.generateRefreshToken = function () {
-  const payload = {
-    _id: this._id,
-  };
+  const payload = { sub: this._id };
 
   return jwt.sign(payload, refreshTokenSecret, {
     expiresIn: refreshTokenExpiry as NonNullable<SignOptions["expiresIn"]>,

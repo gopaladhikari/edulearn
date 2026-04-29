@@ -66,6 +66,12 @@ app.use(
 // Logging
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
+// Routes
+
+import { authRouter } from "./routes/auth.route.js";
+
+app.use("/api/v1/auth", authRouter);
+
 // 404
 app.use((req, _res, next) => {
   next(new ApiError(404, `Api route not found: ${req.originalUrl}`));
