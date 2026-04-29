@@ -9,7 +9,8 @@ import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import hpp from "hpp";
 import passport from "passport";
-import { LocalLogin, LocalRegister } from "./strategy/local.strategy.js";
+import { LocalStrategy } from "./strategy/local.strategy.js";
+import { JwtStrategy } from "./strategy/jwt.strategy.js";
 
 const app = express();
 
@@ -30,8 +31,8 @@ app.use(
 // passport
 
 app.use(passport.initialize());
-LocalLogin(passport);
-LocalRegister(passport);
+LocalStrategy(passport);
+JwtStrategy(passport);
 
 // Helmet
 
