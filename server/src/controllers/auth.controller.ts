@@ -85,18 +85,12 @@ export const loginUser = async (req: Request, res: Response) => {
 export const logoutUser = async (req: Request, res: Response) => {
   const user = req.user!;
 
-  await User.findByIdAndUpdate(
-    user._id,
-    {
-      $unset: {
-        accessToken: 1,
-        refreshToken: 1,
-      },
+  await User.findByIdAndUpdate(user._id, {
+    $unset: {
+      accessToken: 1,
+      refreshToken: 1,
     },
-    {
-      returnDocument: "after",
-    }
-  );
+  });
 
   return res
     .status(200)
@@ -177,9 +171,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     process.env.REFRESH_TOKEN_SECRET as string
   ) as jwt.JwtPayload;
 
-  const user = await User.findById(decodedToken._id).select(
-    "-password -emailVerificationToken -emailVerificationExpires"
-  );
+  const user = await User.findById(decodedToken._id);
 
   if (!user) throw new ApiError(400, "Invalid token");
 
