@@ -3,10 +3,12 @@ import { ApiError, ApiResponse } from "../utils/api-responses.js";
 import crypto from "crypto";
 import type { CookieOptions, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
 import { clientUrl } from "@/utils/constants.js";
 import { sendEmail } from "@/utils/send-email.js";
 import { getSafeUser } from "@/utils/get-safe-user.js";
+import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
+import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
+import { welcomeEmailTemplate } from "@/emails/welcome-after-verification.email.js";
 
 // Generate access and refresh tokens
 const generateAccessAndRefreshTokens = async (user: Express.User) => {
@@ -139,7 +141,13 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
   await user.save();
 
-  return res.status(200).json(new ApiResponse(200, "Email verified", null));
+  res.status(200).json(new ApiResponse(200, "Email verified", null));
+
+  const content = welcomeEmailTemplate(user.username);
+
+  sendEmail(user.email, "Welcome to Edulearn", content).then((result) => {
+    console.log(result);
+  });
 };
 
 export const resendEmailVerification = async (req: Request, res: Response) => {
@@ -156,18 +164,18 @@ export const resendEmailVerification = async (req: Request, res: Response) => {
   user.emailVerificationToken = hashToken;
   user.emailVerificationExpires = new Date(tokenExpiry);
 
-  // const content = emailVerificationEmailTemplate(
-  //   `${siteUrl}/verify-email?token=${unhashedToken}`,
-  //   user.username
-  // );
-
-  // await sendEmail(content, user.email, "Verify your email");
-
   await user.save();
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, "Email verification resent", null));
+  res.status(200).json(new ApiResponse(200, "Email verification resent", null));
+
+  const content = emailVerificationTemplate(
+    `${clientUrl}/verify-email?token=${unhashedToken}`,
+    user.username
+  );
+
+  sendEmail(user.email, "Verify your email", content).then((result) => {
+    console.log(result);
+  });
 };
 
 export const refreshAccessToken = async (req: Request, res: Response) => {
@@ -212,20 +220,20 @@ export const forgotPassword = async (req: Request, res: Response) => {
   user.forgotPasswordToken = hashToken;
   user.forgotPasswordExpires = new Date(tokenExpiry);
 
-  // const content = forgotPasswordEmailTemplate(
-  //   `${siteUrl}/reset-password?token=${unhashedToken}`,
-  //   user.username
-  // );
-
-  // await sendEmail(content, user.email, "Reset your password");
+  const content = forgotPasswordTemplate(
+    user.username,
+    `${clientUrl}/reset-password?token=${unhashedToken}`
+  );
 
   await user.save({
     validateBeforeSave: false,
   });
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, "Password reset email sent", null));
+  res.status(200).json(new ApiResponse(200, "Password reset email sent", null));
+
+  sendEmail(user.email, "Reset your password", content).then((result) => {
+    console.log(result);
+  });
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
