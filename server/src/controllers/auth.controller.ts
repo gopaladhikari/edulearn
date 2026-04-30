@@ -3,15 +3,20 @@ import { ApiError, ApiResponse } from "../utils/api-responses.js";
 import crypto from "crypto";
 import type { CookieOptions, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import type { IUsers } from "@/types/users.t.js";
+import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
+import { clientUrl } from "@/utils/constants.js";
+import { sendEmail } from "@/utils/send-email.js";
+import { getSafeUser } from "@/utils/get-safe-user.js";
 
 // Generate access and refresh tokens
-const generateAccessAndRefreshTokens = (user: IUsers) => {
+const generateAccessAndRefreshTokens = async (user: Express.User) => {
   try {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
     user.refreshToken = refreshToken;
+
+    await user.save({ validateBeforeSave: false });
 
     return { accessToken, refreshToken };
   } catch (error) {
@@ -45,27 +50,32 @@ export const registerUser = async (req: Request, res: Response) => {
 
   const { hashToken, tokenExpiry, unhashedToken } = user.generateToken();
 
-  generateAccessAndRefreshTokens(user);
-
   user.emailVerificationToken = hashToken;
   user.emailVerificationExpires = new Date(tokenExpiry);
 
   await user.save();
 
-  // const content = emailVerificationEmailTemplate(
-  //   `${siteUrl}/verify-email?token=${unhashedToken}`,
-  //   newUser.username
-  // );
+  const content = emailVerificationTemplate(
+    `${clientUrl}/verify-email?token=${unhashedToken}`,
+    user.username
+  );
 
-  // await sendEmail(content, newUser.email, "Verify your email");
+  const safeUser = getSafeUser(user);
 
-  return res.status(201).json(new ApiResponse(201, "User created", { user }));
+  res
+    .status(201)
+    .json(new ApiResponse(201, "User created", { user: safeUser }));
+
+  sendEmail(user.email, "Verify your email", content).then((result) => {
+    console.log(result);
+  });
 };
 
 export const loginUser = async (req: Request, res: Response) => {
   const user = req.user!;
 
-  const { accessToken, refreshToken } = generateAccessAndRefreshTokens(user);
+  const { accessToken, refreshToken } =
+    await generateAccessAndRefreshTokens(user);
 
   await user.save();
 
@@ -179,7 +189,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     throw new ApiError(400, "Invalid token");
 
   const { accessToken, refreshToken: newRefreshToken } =
-    generateAccessAndRefreshTokens(user);
+    await generateAccessAndRefreshTokens(user);
 
   await user.save();
 

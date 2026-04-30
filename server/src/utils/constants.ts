@@ -32,3 +32,5 @@ export enum paymentMethods {
   RAZORPAY = "razorpay",
   FREE = "free",
 }
+
+export const clientUrl = "http://localhost:5173";

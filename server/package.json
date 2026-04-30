@@ -27,12 +27,14 @@
     "helmet": "^8.1.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.3",
+    "mailgen": "^2.0.34",
     "mongoose": "^9.5.0",
     "mongoose-slug-updater": "^3.3.0",
     "morgan": "^1.10.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "resend": "^6.12.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
