@@ -12,12 +12,13 @@ import {
   changeCurrentPassword,
 } from "../controllers/auth.controller.js";
 import {
-  changePasswordValidator,
-  forgotPasswordValidator,
-  resetPasswordValidator,
-  userLoginValidator,
-  userRegisterValidator,
-} from "@/validators/auth.validator.js";
+  changePasswordSchema,
+  emailVerificationTokenSchema,
+  forgotPasswordSchema,
+  loginSchema,
+  registerSchema,
+  resetPasswordSchema,
+} from "@/schemas/auth.schema.js";
 import passport from "passport";
 import { validateRequest } from "@/middlewares/validator.middleware.js";
 
@@ -27,13 +28,12 @@ const verifyJwt = passport.authenticate("jwt", { session: false });
 
 authRouter
   .route("/register")
-  .post(userRegisterValidator(), validateRequest, registerUser);
+  .post(validateRequest({ body: registerSchema }), registerUser);
 
 authRouter
   .route("/login")
   .post(
-    userLoginValidator(),
-    validateRequest,
+    validateRequest({ body: loginSchema }),
     passport.authenticate("local", { session: false }),
     loginUser
   );
@@ -42,7 +42,9 @@ authRouter.route("/logout").post(verifyJwt, logoutUser);
 
 authRouter.route("/current-user").get(verifyJwt, getCurrentUser);
 
-authRouter.route("/verify-email/:verificationToken").post(verifyEmail);
+authRouter
+  .route("/verify-email/:verificationToken")
+  .post(validateRequest({ params: emailVerificationTokenSchema }), verifyEmail);
 
 authRouter.route("/resend-email-verification").post(resendEmailVerification);
 
@@ -50,17 +52,16 @@ authRouter.route("/refresh-token").post(verifyJwt, refreshAccessToken);
 
 authRouter
   .route("/forgot-password")
-  .post(forgotPasswordValidator(), validateRequest, forgotPassword);
+  .post(validateRequest({ body: forgotPasswordSchema }), forgotPassword);
 
 authRouter
   .route("/reset-password/:resetToken")
-  .post(resetPasswordValidator(), validateRequest, resetPassword);
+  .post(validateRequest(resetPasswordSchema), resetPassword);
 
 authRouter
   .route("/change-password")
   .post(
-    changePasswordValidator(),
-    validateRequest,
+    validateRequest({ body: changePasswordSchema }),
     verifyJwt,
     changeCurrentPassword
   );
