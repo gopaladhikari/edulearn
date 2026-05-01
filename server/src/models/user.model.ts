@@ -143,7 +143,7 @@ userSchema.methods.generateToken = function () {
 userSchema.virtual("profile", {
   ref: "UserProfile",
   localField: "_id",
-  foreignField: "userId",
+  foreignField: "user",
   justOne: true,
 });
 
