@@ -3,13 +3,12 @@ import { ApiError, ApiResponse } from "@/utils/api-responses.js";
 import crypto from "crypto";
 import type { CookieOptions, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { clientUrl, defaultAvatar } from "@/utils/constants.js";
+import { clientUrl } from "@/utils/constants.js";
 import { sendEmail } from "@/utils/send-email.js";
 import { getSafeUser } from "@/utils/get-safe-user.js";
 import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
 import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
 import { welcomeEmailTemplate } from "@/emails/welcome-after-verification.email.js";
-import { deleteMedia, uploadMedia } from "@/utils/cloudinary.js";
 
 // Generate access and refresh tokens
 const generateAccessAndRefreshTokens = async (user: Express.User) => {
@@ -290,30 +289,4 @@ export const changeCurrentPassword = async (req: Request, res: Response) => {
   return res
     .status(200)
     .json(new ApiResponse(200, "Password changed successfully", null));
-};
-
-export const updateAvatar = async (req: Request, res: Response) => {
-  const avatar = req.file;
-
-  const user = req.user!;
-
-  if (!avatar) throw new ApiError(400, "Avatar not found. Try again.");
-
-  const result = await uploadMedia(avatar.path);
-
-  if (!result) throw new ApiError(400, "Avatar upload failed.");
-
-  const previousAvatar = user.avatar.secure_url;
-  const previoudAvatarId = user.avatar.public_id;
-
-  user.avatar.secure_url = result.secure_url;
-  user.avatar.public_id = result.public_id;
-
-  await user.save();
-
-  res
-    .status(200)
-    .json(new ApiResponse(200, "Avatar updated successfully", null));
-
-  if (previousAvatar !== defaultAvatar) deleteMedia(previoudAvatarId);
 };

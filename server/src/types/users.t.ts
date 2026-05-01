@@ -2,6 +2,7 @@ import type {
   instructorApplicationStatus,
   UserRoles,
 } from "../utils/constants.js";
+import type { IUserProfile } from "./user-profile.t.types.js";
 
 export interface IUsers {
   username: string;
@@ -17,7 +18,7 @@ export interface IUsers {
   emailVerificationExpires: Date | undefined;
 
   instructorApplicationStatus: instructorApplicationStatus;
-
+  profile: IUserProfile;
   generateAccessToken: () => string;
   generateRefreshToken: () => string;
   generateToken: () => {
