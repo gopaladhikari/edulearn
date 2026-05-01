@@ -38,5 +38,12 @@ export enum gender {
   FEMALE = "female",
 }
 
+export enum instructorApplicationStatus {
+  NOT_APPLIED = "not_applied",
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  REJECTED = "rejected",
+}
+
 export const clientUrl = "http://localhost:5173";
 export const defaultAvatar = "./public/default-avatar.svg";

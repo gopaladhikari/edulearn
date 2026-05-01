@@ -11,7 +11,7 @@ import {
   resetPassword,
   changeCurrentPassword,
   updateAvatar,
-} from "../controllers/user.controller.js";
+} from "@/controllers/user.controller.js";
 import {
   changePasswordSchema,
   emailVerificationTokenSchema,
@@ -19,7 +19,8 @@ import {
   loginSchema,
   registerSchema,
   resetPasswordSchema,
-} from "@/schemas/auth.schema.js";
+  resendEmailVerificationSchema,
+} from "@/schemas/user.schema.js";
 import passport from "passport";
 import { validateRequest } from "@/middlewares/validator.middleware.js";
 import { upload } from "@/middlewares/multer.middleware.js";
@@ -53,7 +54,12 @@ authRouter
   .route("/verify-email/:verificationToken")
   .post(validateRequest({ params: emailVerificationTokenSchema }), verifyEmail);
 
-authRouter.route("/resend-email-verification").post(resendEmailVerification);
+authRouter
+  .route("/resend-email-verification")
+  .post(
+    validateRequest({ body: resendEmailVerificationSchema }),
+    resendEmailVerification
+  );
 
 authRouter.route("/refresh-token").post(verifyJwt, refreshAccessToken);
 

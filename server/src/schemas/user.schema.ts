@@ -54,3 +54,7 @@ export const changePasswordSchema = z.object({
 export const emailVerificationTokenSchema = z.object({
   verificationToken: token,
 });
+
+export const resendEmailVerificationSchema = z.object({
+  email,
+});
