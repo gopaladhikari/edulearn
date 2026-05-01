@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import type { IUsers } from "@/types/users.t.js";
-import { instructorApplicationStatus, UserRoles } from "@/utils/constants.js";
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string;
 const accessTokenExpiry = process.env.ACCESS_TOKEN_EXPIRY;
@@ -23,13 +22,6 @@ const userSchema = new Schema<IUsers>(
       index: true,
     },
 
-    role: {
-      type: String,
-      enum: UserRoles,
-      default: UserRoles.STUDENT,
-      required: [true, "Role is required."],
-    },
-
     email: {
       type: String,
       required: [true, "Email is required."],
@@ -41,15 +33,6 @@ const userSchema = new Schema<IUsers>(
         /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
         "Please provide a valid email address",
       ],
-    },
-
-    instructorApplicationStatus: {
-      type: String,
-      enum: {
-        values: Object.values(instructorApplicationStatus),
-        message: "Invalid instructor application status",
-      },
-      default: instructorApplicationStatus.NOT_APPLIED,
     },
 
     password: {

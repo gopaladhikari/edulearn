@@ -7,7 +7,8 @@ export interface ICourses {
   description: string;
   thumbnail: string;
   price: number;
-  instructorId: Types.ObjectId[]; // user
+  instructor: Types.ObjectId;
+  coInstructors: Types.ObjectId[];
   lectures: HydratedDocument<ILectures>;
   isPublished: boolean;
   language: string;

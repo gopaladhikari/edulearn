@@ -1,38 +1,22 @@
 import type { Types } from "mongoose";
-import type { gender } from "../utils/constants.js";
+import type { gender, UserRoles } from "../utils/constants.js";
 
 interface Address {
   street: string;
   city: string;
   state: string;
-  zip: string;
+  postalCode: string;
   country: string;
 }
 
-interface SocialLinks {
-  youtube: string;
-  linkedin: string;
-  website: string;
-}
-
-interface InstructorDetails {
-  title: string;
-  expertise: string[];
-  experienceYears: number;
-  qualification: string;
-  bannerImage: string;
-  socialLinks: SocialLinks;
-  motivation: string;
-}
-
-interface Avatar {
+export interface Media {
   secure_url: string;
   public_id: string;
 }
 
 export interface IUserProfile {
   user: Types.ObjectId; // userId
-  avatar: Avatar;
+  avatar: Media;
   firstName: string;
   phone: String;
   lastName: string;
@@ -40,8 +24,5 @@ export interface IUserProfile {
   bio: string;
   gender: gender;
   address: Address;
-  instructorDetails: InstructorDetails;
-  reviewedBy: Types.ObjectId; // userId
-  reviewedAt: Date;
-  rejectionReason: string;
+  role: UserRoles;
 }

@@ -1,0 +1,79 @@
+import type { InstructorDetails } from "@/types/instruction-application.t.js";
+import { instructorApplicationStatus } from "@/utils/constants.js";
+import { Types, Schema, model } from "mongoose";
+
+const instructorApplicationSchema = new Schema<InstructorDetails>(
+  {
+    user: {
+      type: Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
+    },
+
+    motivation: {
+      type: String,
+      required: [true, "Please tell us why you want to become an instructor"],
+      maxlength: [800, "Motivation cannot exceed 800 characters"],
+    },
+
+    experienceYears: {
+      type: Number,
+      min: 0,
+      max: 30,
+    },
+
+    expertise: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+
+    qualification: {
+      type: String,
+      maxlength: 200,
+    },
+
+    status: {
+      type: String,
+      enum: {
+        values: Object.values(instructorApplicationStatus),
+        message: "Invalid instructor application status",
+      },
+      default: instructorApplicationStatus.PENDING,
+    },
+
+    reviewedBy: {
+      type: Types.ObjectId,
+      ref: "User",
+      required(): boolean {
+        return this.status !== instructorApplicationStatus.PENDING;
+      },
+    },
+
+    reviewedAt: Date,
+
+    rejectionReason: {
+      type: String,
+      maxlength: 500,
+      required(): boolean {
+        return this.status === instructorApplicationStatus.REJECTED;
+      },
+    },
+
+    socialLinks: {
+      type: {
+        youtube: String,
+        linkedin: String,
+        website: String,
+      },
+    },
+  },
+  { timestamps: true }
+);
+
+export const InstructorApplication = model(
+  "InstructorApplication",
+  instructorApplicationSchema
+);

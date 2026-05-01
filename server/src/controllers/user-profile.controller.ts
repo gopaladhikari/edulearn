@@ -1,6 +1,7 @@
+import { User } from "@/models/user.model.js";
 import { ApiError, ApiResponse } from "@/utils/api-responses.js";
 import { deleteMedia, uploadMedia } from "@/utils/cloudinary.js";
-import { defaultAvatar } from "@/utils/constants.js";
+import { defaultAvatar, UserRoles } from "@/utils/constants.js";
 import type { Request, Response } from "express";
 
 export const updateAvatar = async (req: Request, res: Response) => {

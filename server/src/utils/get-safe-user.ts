@@ -1,12 +1,13 @@
 export const getSafeUser = (user: Express.User) => {
   return {
-    id: user._id.toString(),
+    _id: user._id.toString(),
     username: user.username,
     email: user.email,
-    firstName: user.firstName,
-    lastName: user.lastName,
+    firstName: user.profile.firstName,
+    lastName: user.profile.lastName,
     role: user.role,
-    avatar: user.avatar,
+    avatar: user.profile.avatar,
+    gender: user.profile.gender,
     isEmailVerified: user.isEmailVerified,
   };
 };

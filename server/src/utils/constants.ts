@@ -39,7 +39,6 @@ export enum gender {
 }
 
 export enum instructorApplicationStatus {
-  NOT_APPLIED = "not_applied",
   PENDING = "pending",
   ACCEPTED = "accepted",
   REJECTED = "rejected",

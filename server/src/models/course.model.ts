@@ -75,20 +75,19 @@ const courseSchema = new mongoose.Schema<ICourses>(
       required: [true, "Course thumbnail is required."],
     },
 
-    instructorId: {
+    instructor: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: [true, "Instructor is required."],
+    },
+
+    coInstructors: {
       type: [
         {
           type: mongoose.Types.ObjectId,
           ref: "User",
         },
       ],
-      validate: {
-        validator(v) {
-          return Array.isArray(v) && v.length > 0;
-        },
-
-        message: "A course must have at least one instructor.",
-      },
     },
 
     isPublished: {
