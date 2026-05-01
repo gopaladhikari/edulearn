@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import type { IUsers } from "@/types/users.t.js";
-import { gender, UserRoles } from "@/utils/constants.js";
+import { defaultAvatar, gender, UserRoles } from "@/utils/constants.js";
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string;
 const accessTokenExpiry = process.env.ACCESS_TOKEN_EXPIRY;
@@ -13,8 +13,13 @@ const refreshTokenExpiry = process.env.REFRESH_TOKEN_EXPIRY;
 const userSchema = new Schema<IUsers>(
   {
     avatar: {
-      type: String,
-      default: "./public/default-avatar.svg",
+      secure_url: {
+        type: String,
+        default: defaultAvatar,
+      },
+      public_id: {
+        type: String,
+      },
     },
 
     gender: {

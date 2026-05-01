@@ -1,7 +1,10 @@
 import type { gender, UserRoles } from "../utils/constants.js";
 
 export interface IUsers {
-  avatar: string;
+  avatar: {
+    secure_url: string;
+    public_id: string;
+  };
   firstName: string;
   lastName: string;
   username: string;

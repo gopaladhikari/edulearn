@@ -20,12 +20,26 @@ export const uploadMedia = async (mediaPath: string) => {
   }
 };
 
-export const deleteVideo = async (mediaId: string) => {
+export const deleteMedia = async (mediaId: string) => {
   try {
-    await cloudinary.uploader.destroy(mediaId, {
-      resource_type: "video",
+    const result = await cloudinary.uploader.destroy(mediaId, {
+      resource_type: "auto",
     });
+    return result;
   } catch (error) {
     console.error(error);
+    return null;
+  }
+};
+
+export const deleteVideo = async (mediaId: string) => {
+  try {
+    const result = await cloudinary.uploader.destroy(mediaId, {
+      resource_type: "video",
+    });
+    return result;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 };

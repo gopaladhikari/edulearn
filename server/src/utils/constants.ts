@@ -39,3 +39,4 @@ export enum gender {
 }
 
 export const clientUrl = "http://localhost:5173";
+export const defaultAvatar = "./public/default-avatar.svg";

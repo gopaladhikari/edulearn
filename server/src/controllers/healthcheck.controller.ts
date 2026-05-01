@@ -1,4 +1,4 @@
-import { ApiResponse } from "../utils/api-responses.js";
+import { ApiResponse } from "@/utils/api-responses.js";
 import type { Response, Request } from "express";
 import { dbConnection } from "@/utils/connect-to-db.js";
 
