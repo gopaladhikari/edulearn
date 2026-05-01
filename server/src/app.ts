@@ -71,7 +71,7 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 import { authRouter } from "./routes/auth.route.js";
 import { healthCheckRouter } from "./routes/healthcheck.route.js";
 
-app.use("/api/v1/healthcheck", healthCheckRouter);
+app.use("/health", healthCheckRouter);
 
 app.use("/api/v1/auth", authRouter);
 
