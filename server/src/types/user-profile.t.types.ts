@@ -1,5 +1,5 @@
 import type { Types } from "mongoose";
-import type { gender, UserRoles } from "../utils/constants.js";
+import type { gender } from "../utils/constants.js";
 
 interface Address {
   street: string;
@@ -24,5 +24,4 @@ export interface IUserProfile {
   bio: string;
   gender: gender;
   address: Address;
-  role: UserRoles;
 }

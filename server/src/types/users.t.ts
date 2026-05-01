@@ -1,3 +1,4 @@
+import type { UserRoles } from "@/utils/constants.js";
 import type { IUserProfile } from "./user-profile.t.types.js";
 
 export interface IUsers {
@@ -11,6 +12,7 @@ export interface IUsers {
   emailVerificationToken: string | undefined;
   emailVerificationExpires: Date | undefined;
   profile: IUserProfile;
+  role: UserRoles;
   generateAccessToken: () => string;
   generateRefreshToken: () => string;
   generateToken: () => {

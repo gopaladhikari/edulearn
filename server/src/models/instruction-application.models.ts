@@ -7,13 +7,13 @@ const instructorApplicationSchema = new Schema<InstructorDetails>(
     user: {
       type: Types.ObjectId,
       ref: "User",
-      required: true,
+      required: [true, "User is required."],
       unique: true,
     },
 
     motivation: {
       type: String,
-      required: [true, "Please tell us why you want to become an instructor"],
+      required: [true, "Motivation is required."],
       maxlength: [800, "Motivation cannot exceed 800 characters"],
     },
 
@@ -23,16 +23,21 @@ const instructorApplicationSchema = new Schema<InstructorDetails>(
       max: 30,
     },
 
-    expertise: [
-      {
-        type: String,
-        trim: true,
+    expertise: {
+      type: [String],
+
+      validate: {
+        validator: function (value: string[]) {
+          return Array.isArray(value) && value.length > 0;
+        },
+        message: "Expertise is required.",
       },
-    ],
+    },
 
     qualification: {
       type: String,
       maxlength: 200,
+      required: [true, "Qualification is required."],
     },
 
     status: {

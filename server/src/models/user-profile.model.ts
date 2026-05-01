@@ -1,5 +1,5 @@
 import type { IUserProfile } from "@/types/user-profile.t.types.js";
-import { defaultAvatar, gender, UserRoles } from "@/utils/constants.js";
+import { defaultAvatar, gender } from "@/utils/constants.js";
 import { Schema, model, Types } from "mongoose";
 
 const userProfileSchema = new Schema<IUserProfile>(
@@ -12,23 +12,15 @@ const userProfileSchema = new Schema<IUserProfile>(
       unique: true,
     },
 
-    role: {
-      type: String,
-      enum: {
-        values: Object.values(UserRoles),
-        message: "Invalid user rolee",
-      },
-      default: UserRoles.STUDENT,
-      required: [true, "Role is required."],
-    },
-
     // Basic Info
     firstName: {
       type: String,
+      required: [true, "First name is required."],
     },
 
     lastName: {
       type: String,
+      required: [true, "Last name is required."],
     },
 
     avatar: {
@@ -56,6 +48,7 @@ const userProfileSchema = new Schema<IUserProfile>(
         values: Object.values(gender),
         message: "Invalid gender",
       },
+      required: [true, "Gender is required."],
     },
 
     // Address
