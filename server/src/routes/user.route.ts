@@ -10,7 +10,8 @@ import {
   forgotPassword,
   resetPassword,
   changeCurrentPassword,
-} from "../controllers/auth.controller.js";
+  updateAvatar,
+} from "../controllers/user.controller.js";
 import {
   changePasswordSchema,
   emailVerificationTokenSchema,
@@ -21,6 +22,8 @@ import {
 } from "@/schemas/auth.schema.js";
 import passport from "passport";
 import { validateRequest } from "@/middlewares/validator.middleware.js";
+import { upload } from "@/middlewares/multer.middleware.js";
+import { arcjetSignUpProtection } from "@/middlewares/arcjet.middleware.js";
 
 const authRouter = Router();
 
@@ -28,7 +31,11 @@ const verifyJwt = passport.authenticate("jwt", { session: false });
 
 authRouter
   .route("/register")
-  .post(validateRequest({ body: registerSchema }), registerUser);
+  .post(
+    validateRequest({ body: registerSchema }),
+    arcjetSignUpProtection,
+    registerUser
+  );
 
 authRouter
   .route("/login")
@@ -65,5 +72,9 @@ authRouter
     verifyJwt,
     changeCurrentPassword
   );
+
+authRouter
+  .route("/update-avatar")
+  .post(verifyJwt, upload.single("avatar"), updateAvatar);
 
 export { authRouter };

@@ -32,7 +32,7 @@ export const healthCheck = (_req: Request, res: Response) => {
         },
       },
       server: {
-        status: "healthy",
+        status: "Ok",
         uptime: process.uptime(),
         memoryUsage: process.memoryUsage(),
       },

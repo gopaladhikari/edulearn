@@ -35,8 +35,10 @@ LocalStrategy(passport);
 JwtStrategy(passport);
 
 // Helmet
-
 app.use(helmet());
+
+// Arcject
+app.use(arcjectProtection);
 
 // Body parser
 
@@ -68,12 +70,13 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
 // Routes
 
-import { authRouter } from "./routes/auth.route.js";
+import { authRouter } from "./routes/user.route.js";
 import { healthCheckRouter } from "./routes/healthcheck.route.js";
+import { arcjectProtection } from "./middlewares/arcjet.middleware.js";
 
 app.use("/health", healthCheckRouter);
 
-app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/users", authRouter);
 
 // 404
 app.use((req, _res, next) => {

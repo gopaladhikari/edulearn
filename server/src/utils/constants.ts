@@ -33,4 +33,9 @@ export enum paymentMethods {
   FREE = "free",
 }
 
+export enum gender {
+  MALE = "male",
+  FEMALE = "female",
+}
+
 export const clientUrl = "http://localhost:5173";

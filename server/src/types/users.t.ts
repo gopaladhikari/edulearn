@@ -1,4 +1,4 @@
-import type { UserRoles } from "../utils/constants.js";
+import type { gender, UserRoles } from "../utils/constants.js";
 
 export interface IUsers {
   avatar: string;
@@ -16,6 +16,7 @@ export interface IUsers {
   forgotPasswordExpires: Date | undefined;
   emailVerificationToken: string | undefined;
   emailVerificationExpires: Date | undefined;
+  gender: gender;
   generateAccessToken: () => string;
   generateRefreshToken: () => string;
   generateToken: () => {

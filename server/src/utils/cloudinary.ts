@@ -13,7 +13,7 @@ export const uploadMedia = async (mediaPath: string) => {
       resource_type: "auto",
     });
     console.log(result);
-    return result.public_id;
+    return result;
   } catch (error) {
     console.error(error);
     return null;

@@ -9,6 +9,7 @@ import { getSafeUser } from "@/utils/get-safe-user.js";
 import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
 import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
 import { welcomeEmailTemplate } from "@/emails/welcome-after-verification.email.js";
+import { uploadMedia } from "@/utils/cloudinary.js";
 
 // Generate access and refresh tokens
 const generateAccessAndRefreshTokens = async (user: Express.User) => {
@@ -112,9 +113,11 @@ export const logoutUser = async (req: Request, res: Response) => {
 };
 
 export const getCurrentUser = async (req: Request, res: Response) => {
-  const user = req.user!;
-
-  return res.status(200).json(new ApiResponse(200, "User details", { user }));
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, "User details", { user: getSafeUser(req.user!) })
+    );
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
@@ -205,7 +208,11 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     .status(200)
     .cookie("accessToken", accessToken, cookiesOptions)
     .cookie("refreshToken", newRefreshToken, cookiesOptions)
-    .json(new ApiResponse(200, "Access token refreshed", { user }));
+    .json(
+      new ApiResponse(200, "Access token refreshed", {
+        user: getSafeUser(user),
+      })
+    );
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
@@ -283,4 +290,24 @@ export const changeCurrentPassword = async (req: Request, res: Response) => {
   return res
     .status(200)
     .json(new ApiResponse(200, "Password changed successfully", null));
+};
+
+export const updateAvatar = async (req: Request, res: Response) => {
+  const avatar = req.file;
+
+  const user = req.user!;
+
+  if (!avatar) throw new ApiError(400, "Avatar not found. Try again.");
+
+  const result = await uploadMedia(avatar.path);
+
+  if (!result) throw new ApiError(400, "Avatar upload failed.");
+
+  user.avatar = result.secure_url;
+
+  await user.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Avatar updated successfully", null));
 };
