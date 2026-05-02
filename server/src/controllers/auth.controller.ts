@@ -3,7 +3,7 @@ import { ApiError, ApiResponse } from "@/utils/api-responses.js";
 import crypto from "crypto";
 import type { CookieOptions, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { clientUrl } from "@/utils/constants.js";
+import { clientUrl, defaultAvatar } from "@/utils/constants.js";
 import { sendEmail } from "@/utils/send-email.js";
 import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
 import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
@@ -59,11 +59,18 @@ export const registerUser = async (req: Request, res: Response) => {
   await user.save();
 
   const content = emailVerificationTemplate(
-    `${clientUrl}/verify-email?token=${unhashedToken}`,
-    user.username
+    user.username,
+    `${clientUrl}/verify-email?token=${unhashedToken}`
   );
 
-  res.status(201).json(new ApiResponse(201, "User created", { user }));
+  res.status(201).json(
+    new ApiResponse(201, "Registration successful! 🎉", {
+      message:
+        "We've sent a verification email to your inbox. Please verify your email address to complete registration.",
+      email: user.email,
+      expiresIn: "20 minutes",
+    })
+  );
 
   sendEmail(user.email, "Verify your email", content).then((result) => {
     console.log(result);
@@ -75,8 +82,6 @@ export const loginUser = async (req: Request, res: Response) => {
 
   const { accessToken, refreshToken } =
     await generateAccessAndRefreshTokens(user);
-
-  await user.save();
 
   return res
     .status(200)
@@ -117,8 +122,6 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 export const verifyEmail = async (req: Request, res: Response) => {
   const { verificationToken } = req.params;
 
-  if (!verificationToken) throw new ApiError(400, "Invalid token here");
-
   const hashedVerificationToken = crypto
     .createHash("sha256")
     .update(verificationToken as string)
@@ -129,15 +132,10 @@ export const verifyEmail = async (req: Request, res: Response) => {
   session.startTransaction();
 
   try {
-    const user = await User.findOne(
-      {
-        emailVerificationToken: hashedVerificationToken,
-        emailVerificationExpires: { $gt: Date.now() },
-      },
-      {
-        session,
-      }
-    );
+    const user = await User.findOne({
+      emailVerificationToken: hashedVerificationToken,
+      emailVerificationExpires: { $gt: Date.now() },
+    });
 
     if (!user) throw new ApiError(400, "Token is invalid or expired.");
 
@@ -154,6 +152,9 @@ export const verifyEmail = async (req: Request, res: Response) => {
       [
         {
           user: user._id,
+          avatar: {
+            secure_url: defaultAvatar,
+          },
         },
       ],
       {
@@ -197,8 +198,8 @@ export const resendEmailVerification = async (req: Request, res: Response) => {
   res.status(200).json(new ApiResponse(200, "Email verification resent", null));
 
   const content = emailVerificationTemplate(
-    `${clientUrl}/verify-email?token=${unhashedToken}`,
-    user.username
+    user.username,
+    `${clientUrl}/verify-email?token=${unhashedToken}`
   );
 
   sendEmail(user.email, "Verify your email", content).then((result) => {
@@ -248,16 +249,16 @@ export const forgotPassword = async (req: Request, res: Response) => {
   user.forgotPasswordToken = hashToken;
   user.forgotPasswordExpires = new Date(tokenExpiry);
 
-  const content = forgotPasswordTemplate(
-    user.username,
-    `${clientUrl}/reset-password?token=${unhashedToken}`
-  );
-
   await user.save({
     validateBeforeSave: false,
   });
 
   res.status(200).json(new ApiResponse(200, "Password reset email sent", null));
+
+  const content = forgotPasswordTemplate(
+    user.username,
+    `${clientUrl}/reset-password?token=${unhashedToken}`
+  );
 
   sendEmail(user.email, "Reset your password", content).then((result) => {
     console.log(result);
@@ -268,8 +269,6 @@ export const resetPassword = async (req: Request, res: Response) => {
   const { resetToken } = req.params; // unhashed token
   const { newPassword } = req.body;
 
-  if (!resetToken) throw new ApiError(400, "Invalid token here");
-
   const hashedResetToken = crypto
     .createHash("sha256")
     .update(resetToken as string)
@@ -277,7 +276,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
   const user = await User.findOne({
     forgotPasswordToken: hashedResetToken,
-    fogotPasswordExpires: { $gt: Date.now() },
+    forgotPasswordExpires: { $gt: Date.now() },
   });
 
   if (!user) throw new ApiError(400, "Token is invalid or expired.");
@@ -296,7 +295,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 export const changeCurrentPassword = async (req: Request, res: Response) => {
   const { oldPassword, newPassword } = req.body;
 
-  const user = await User.findById(req.user?._id);
+  const user = await User.findById(req.user?._id).select("+password");
 
   if (!user) throw new ApiError(400, "User not found");
 

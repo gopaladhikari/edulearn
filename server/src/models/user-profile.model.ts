@@ -34,7 +34,6 @@ const userProfileSchema = new Schema<IUserProfile>(
           type: String,
         },
       },
-      required: [true, "Avatar is required."],
     },
 
     bio: {

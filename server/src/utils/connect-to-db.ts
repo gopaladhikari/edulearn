@@ -40,6 +40,7 @@ class DatabaseConnection {
         socketTimeoutMS: 45000,
         family: 4, // Use IPv4
         appName,
+        dbName: appName,
       };
 
       if (process.env.NODE_ENV === "development") mongoose.set("debug", true);

@@ -15,13 +15,13 @@ const signUpProtection = arcjet({
   rules: [
     protectSignup({
       email: {
-        mode: "LIVE",
-        deny: ["DISPOSABLE", "INVALID", "NO_MX_RECORDS", "NO_GRAVATAR"],
+        mode: process.env.NODE_ENV === "development" ? "DRY_RUN" : "LIVE",
+        deny: ["DISPOSABLE", "INVALID", "NO_MX_RECORDS"],
       },
 
       bots: {
         mode: "LIVE",
-        allow: [],
+        allow: ["POSTMAN"],
       },
 
       rateLimit: {
@@ -40,14 +40,14 @@ const aj = arcjet({
 
     detectBot({
       mode: "LIVE",
-      allow: ["CATEGORY:SEARCH_ENGINE"],
+      allow: ["CATEGORY:SEARCH_ENGINE", "POSTMAN"],
     }),
 
     tokenBucket({
       mode: "LIVE",
-      refillRate: 20,
-      interval: 5,
-      capacity: 20,
+      refillRate: 50,
+      interval: 60,
+      capacity: 100,
     }),
 
     slidingWindow({
@@ -90,7 +90,7 @@ export const arcjectProtection = async (
   _res: Response,
   next: NextFunction
 ) => {
-  const decision = await aj.protect(req, { requested: 5 });
+  const decision = await aj.protect(req, { requested: 1 });
 
   handleDecision(decision);
 

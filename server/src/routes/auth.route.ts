@@ -40,6 +40,7 @@ authRouter
   .route("/login")
   .post(
     validateRequest({ body: loginSchema }),
+    arcjetSignUpProtection,
     passport.authenticate("local", { session: false }),
     loginUser
   );
