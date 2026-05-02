@@ -1,5 +1,5 @@
 import type { UserRoles } from "@/utils/constants.js";
-import type { IUserProfile } from "./user-profile.t.types.js";
+import type { IUserProfile } from "./user-profile.t.js";
 
 export interface IUsers {
   username: string;

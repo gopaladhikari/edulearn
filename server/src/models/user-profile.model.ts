@@ -1,4 +1,4 @@
-import type { IUserProfile } from "@/types/user-profile.t.types.js";
+import type { IUserProfile } from "@/types/user-profile.t.js";
 import { defaultAvatar, gender } from "@/utils/constants.js";
 import { Schema, model, Types } from "mongoose";
 
@@ -28,8 +28,12 @@ const userProfileSchema = new Schema<IUserProfile>(
         secure_url: {
           type: String,
           default: defaultAvatar,
+          required: [true, "Secure url is required."],
         },
-        public_id: String,
+        public_id: {
+          type: String,
+          required: [true, "Public id is required."],
+        },
       },
     },
 

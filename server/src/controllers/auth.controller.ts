@@ -5,7 +5,6 @@ import type { CookieOptions, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { clientUrl } from "@/utils/constants.js";
 import { sendEmail } from "@/utils/send-email.js";
-import { getSafeUser } from "@/utils/get-safe-user.js";
 import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
 import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
 import { welcomeEmailTemplate } from "@/emails/welcome-after-verification.email.js";
@@ -62,11 +61,7 @@ export const registerUser = async (req: Request, res: Response) => {
     user.username
   );
 
-  const safeUser = getSafeUser(user);
-
-  res
-    .status(201)
-    .json(new ApiResponse(201, "User created", { user: safeUser }));
+  res.status(201).json(new ApiResponse(201, "User created", { user }));
 
   sendEmail(user.email, "Verify your email", content).then((result) => {
     console.log(result);
@@ -114,9 +109,7 @@ export const logoutUser = async (req: Request, res: Response) => {
 export const getCurrentUser = async (req: Request, res: Response) => {
   return res
     .status(200)
-    .json(
-      new ApiResponse(200, "User details", { user: getSafeUser(req.user!) })
-    );
+    .json(new ApiResponse(200, "User details", { user: req.user }));
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
@@ -207,11 +200,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     .status(200)
     .cookie("accessToken", accessToken, cookiesOptions)
     .cookie("refreshToken", newRefreshToken, cookiesOptions)
-    .json(
-      new ApiResponse(200, "Access token refreshed", {
-        user: getSafeUser(user),
-      })
-    );
+    .json(new ApiResponse(200, "Access token refreshed", { user }));
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {

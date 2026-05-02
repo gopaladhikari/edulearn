@@ -1,5 +1,5 @@
 import type { Types } from "mongoose";
-import type { Media } from "./user-profile.t.types.js";
+import type { Media } from "./user-profile.t.js";
 import type { instructorApplicationStatus } from "@/utils/constants.js";
 
 interface SocialLinks {

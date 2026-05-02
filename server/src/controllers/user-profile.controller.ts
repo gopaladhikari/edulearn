@@ -1,8 +1,48 @@
-import { User } from "@/models/user.model.js";
+import { UserProfile } from "@/models/user-profile.model.js";
 import { ApiError, ApiResponse } from "@/utils/api-responses.js";
 import { deleteMedia, uploadMedia } from "@/utils/cloudinary.js";
-import { defaultAvatar, UserRoles } from "@/utils/constants.js";
+import { defaultAvatar } from "@/utils/constants.js";
 import type { Request, Response } from "express";
+
+export const updateProfile = async (req: Request, res: Response) => {
+  const user = req.user!;
+
+  const allowedFields = [
+    "firstName",
+    "lastName",
+    "avatar",
+    "bio",
+    "phone",
+    "dateOfBirth",
+    "gender",
+    "address",
+  ];
+
+  const updateData = Object.fromEntries(
+    Object.entries(req.body).filter(([key]) => allowedFields.includes(key))
+  );
+
+  const profile = await UserProfile.findOneAndUpdate(
+    { user: user._id },
+    {
+      $set: updateData,
+      $setOnInsert: {
+        user: user._id,
+      },
+    },
+    {
+      upsert: true,
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!profile) throw new ApiError(400, "Profile not found.");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Profile updated successfully.", { user }));
+};
 
 export const updateAvatar = async (req: Request, res: Response) => {
   const avatar = req.file;
