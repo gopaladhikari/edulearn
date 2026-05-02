@@ -23,20 +23,8 @@ export const updateProfile = async (req: Request, res: Response) => {
 
   const profile = await UserProfile.findOneAndUpdate(
     { user: user._id },
-    {
-      $set: updateData,
-      $setOnInsert: {
-        user: user._id,
-        avatar: {
-          secure_url: defaultAvatar,
-        },
-      },
-    },
-    {
-      upsert: true,
-      new: true,
-      runValidators: true,
-    }
+    { $set: updateData },
+    { new: true }
   );
 
   if (!profile) throw new ApiError(400, "Profile not found.");

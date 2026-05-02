@@ -67,5 +67,11 @@ export const updateProfileSchema = z.object({
   phone: z.string().trim().optional(),
   dateOfBirth: z.string().trim().optional(),
   gender: z.enum(Object.values(gender)).optional(),
-  address: z.string().trim().optional(),
+  address: z.object({
+    street: z.string().trim().optional(),
+    city: z.string().trim().optional(),
+    state: z.string().trim(),
+    country: z.string().trim(),
+    postalCode: z.string().trim().optional(),
+  }),
 });

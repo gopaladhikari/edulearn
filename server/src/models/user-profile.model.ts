@@ -15,12 +15,12 @@ const userProfileSchema = new Schema<IUserProfile>(
     // Basic Info
     firstName: {
       type: String,
-      required: [true, "First name is required."],
+      maxlength: [20, "First name should be max 20 characters."],
     },
 
     lastName: {
       type: String,
-      required: [true, "Last name is required."],
+      maxlength: [20, "Last name should be max 20 characters."],
     },
 
     avatar: {
@@ -34,6 +34,7 @@ const userProfileSchema = new Schema<IUserProfile>(
           type: String,
         },
       },
+      required: [true, "Avatar is required."],
     },
 
     bio: {
@@ -51,7 +52,6 @@ const userProfileSchema = new Schema<IUserProfile>(
         values: Object.values(gender),
         message: "Invalid gender",
       },
-      required: [true, "Gender is required."],
     },
 
     // Address
@@ -60,7 +60,7 @@ const userProfileSchema = new Schema<IUserProfile>(
         street: String,
         city: { type: String, required: true },
         state: String,
-        country: { type: String, default: "Nepal" },
+        country: { type: String, required: true },
         postalCode: String,
       },
     },

@@ -8,6 +8,8 @@ import { sendEmail } from "@/utils/send-email.js";
 import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
 import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
 import { welcomeEmailTemplate } from "@/emails/welcome-after-verification.email.js";
+import { UserProfile } from "@/models/user-profile.model.js";
+import mongoose from "mongoose";
 
 // Generate access and refresh tokens
 const generateAccessAndRefreshTokens = async (user: Express.User) => {
@@ -122,27 +124,58 @@ export const verifyEmail = async (req: Request, res: Response) => {
     .update(verificationToken as string)
     .digest("hex");
 
-  const user = await User.findOne({
-    emailVerificationToken: hashedVerificationToken,
-    emailVerificationExpires: { $gt: Date.now() },
-  });
+  const session = await mongoose.startSession();
 
-  if (!user) throw new ApiError(400, "Token is invalid or expired.");
+  session.startTransaction();
 
-  user.isEmailVerified = true;
+  try {
+    const user = await User.findOne(
+      {
+        emailVerificationToken: hashedVerificationToken,
+        emailVerificationExpires: { $gt: Date.now() },
+      },
+      {
+        session,
+      }
+    );
 
-  user.emailVerificationToken = undefined;
-  user.emailVerificationExpires = undefined;
+    if (!user) throw new ApiError(400, "Token is invalid or expired.");
 
-  await user.save();
+    user.isEmailVerified = true;
 
-  res.status(200).json(new ApiResponse(200, "Email verified", null));
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
 
-  const content = welcomeEmailTemplate(user.username);
+    await user.save({
+      session,
+    });
 
-  sendEmail(user.email, "Welcome to Edulearn", content).then((result) => {
-    console.log(result);
-  });
+    await UserProfile.create(
+      [
+        {
+          user: user._id,
+        },
+      ],
+      {
+        session,
+      }
+    );
+
+    await session.commitTransaction();
+
+    res.status(200).json(new ApiResponse(200, "Email verified", null));
+
+    const content = welcomeEmailTemplate(user.username);
+
+    sendEmail(user.email, "Welcome to Edulearn", content).then((result) => {
+      console.log(result);
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
 };
 
 export const resendEmailVerification = async (req: Request, res: Response) => {
