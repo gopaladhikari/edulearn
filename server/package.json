@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "tsx watch --env-file=.env src/index.ts",
     "build": "tsc && tsc-alias",
-    "prestart": "npm install",
+    "prebuild": "npm install",
     "start": "node --env-file=.env dist/index.js"
   },
   "keywords": [
