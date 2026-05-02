@@ -10,7 +10,6 @@ export const updateProfile = async (req: Request, res: Response) => {
   const allowedFields = [
     "firstName",
     "lastName",
-    "avatar",
     "bio",
     "phone",
     "dateOfBirth",
@@ -28,6 +27,9 @@ export const updateProfile = async (req: Request, res: Response) => {
       $set: updateData,
       $setOnInsert: {
         user: user._id,
+        avatar: {
+          secure_url: defaultAvatar,
+        },
       },
     },
     {

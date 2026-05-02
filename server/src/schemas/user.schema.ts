@@ -1,13 +1,14 @@
+import { gender } from "@/utils/constants.js";
 import { z } from "zod";
 
 const username = z
   .string()
   .min(4, "Username must be at least 4 characters")
   .max(20, "Username must be at most 20 characters")
-  .regex(/^[a-z0-9_]+$/, "Username must be lowercase alphanumeric/underscore")
+  .lowercase()
   .trim();
 
-const email = z.email("Email is required").toLowerCase().trim();
+const email = z.email("Email is required").trim();
 
 const password = z
   .string()
@@ -57,4 +58,14 @@ export const emailVerificationTokenSchema = z.object({
 
 export const resendEmailVerificationSchema = z.object({
   email,
+});
+
+export const updateProfileSchema = z.object({
+  firstName: z.string().trim(),
+  lastName: z.string().trim(),
+  bio: z.string().trim().optional(),
+  phone: z.string().trim().optional(),
+  dateOfBirth: z.string().trim().optional(),
+  gender: z.enum(Object.values(gender)).optional(),
+  address: z.string().trim().optional(),
 });

@@ -32,7 +32,6 @@ const userProfileSchema = new Schema<IUserProfile>(
         },
         public_id: {
           type: String,
-          required: [true, "Public id is required."],
         },
       },
     },

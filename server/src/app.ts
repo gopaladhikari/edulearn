@@ -77,8 +77,7 @@ import { userProfileRouter } from "./routes/user-profile.route.js";
 
 app.use("/health", healthCheckRouter);
 
-app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/profile", userProfileRouter);
+app.use("/api/v1/user", authRouter, userProfileRouter);
 
 // 404
 app.use((req, _res, next) => {
