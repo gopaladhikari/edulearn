@@ -51,7 +51,7 @@ app.use(cookieParser());
 app.use(express.static("public"));
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: clientUrl,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
     allowedHeaders: [
@@ -74,6 +74,7 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 import { authRouter } from "./routes/auth.route.js";
 import { healthCheckRouter } from "./routes/healthcheck.route.js";
 import { userProfileRouter } from "./routes/user-profile.route.js";
+import { clientUrl } from "./utils/constants.js";
 
 app.use("/health", healthCheckRouter);
 
