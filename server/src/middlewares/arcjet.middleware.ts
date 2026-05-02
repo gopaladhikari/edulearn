@@ -9,13 +9,14 @@ import arcjet, {
 import { isSpoofedBot } from "@arcjet/inspect";
 import type { NextFunction, Request, Response } from "express";
 import { ApiError } from "@/utils/api-responses.js";
+import { findIp } from "@arcjet/ip";
 
 const signUpProtection = arcjet({
   key: process.env.ARCJET_KEY!,
   rules: [
     protectSignup({
       email: {
-        mode: process.env.NODE_ENV === "development" ? "DRY_RUN" : "LIVE",
+        mode: "LIVE",
         deny: ["DISPOSABLE", "INVALID", "NO_MX_RECORDS"],
       },
 
@@ -26,6 +27,7 @@ const signUpProtection = arcjet({
 
       rateLimit: {
         mode: "LIVE",
+        characteristics: ["ip"],
         interval: "1m",
         max: 5,
       },
@@ -47,6 +49,7 @@ const aj = arcjet({
       mode: "LIVE",
       refillRate: 50,
       interval: 60,
+      characteristics: ["ip"],
       capacity: 100,
     }),
 
@@ -90,7 +93,9 @@ export const arcjectProtection = async (
   _res: Response,
   next: NextFunction
 ) => {
-  const decision = await aj.protect(req, { requested: 1 });
+  const ip = findIp(req);
+
+  const decision = await aj.protect(req, { requested: 1, ip });
 
   handleDecision(decision);
 
@@ -103,9 +108,11 @@ export const arcjetSignUpProtection = async (
   next: NextFunction
 ) => {
   const { email } = req.body;
+  const ip = findIp(req);
 
   const decision = await signUpProtection.protect(req, {
     email,
+    ip,
   });
 
   handleDecision(decision);

@@ -10,6 +10,7 @@ import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
 import { welcomeEmailTemplate } from "@/emails/welcome-after-verification.email.js";
 import { UserProfile } from "@/models/user-profile.model.js";
 import mongoose from "mongoose";
+import { getFormatedUser } from "@/utils/get-formated-user.js";
 
 // Generate access and refresh tokens
 const generateAccessAndRefreshTokens = async (user: Express.User) => {
@@ -89,7 +90,7 @@ export const loginUser = async (req: Request, res: Response) => {
     .cookie("refreshToken", refreshToken, cookiesOptions)
     .json(
       new ApiResponse(200, "User logged in successfully", {
-        user,
+        user: getFormatedUser(user),
         accessToken,
         refreshToken,
       })
@@ -110,13 +111,15 @@ export const logoutUser = async (req: Request, res: Response) => {
     .status(200)
     .clearCookie("accessToken", cookiesOptions)
     .clearCookie("refreshToken", cookiesOptions)
-    .json(new ApiResponse(200, "User logged out", null));
+    .json(new ApiResponse(200, "User logged out", {}));
 };
 
 export const getCurrentUser = async (req: Request, res: Response) => {
   return res
     .status(200)
-    .json(new ApiResponse(200, "User details", { user: req.user }));
+    .json(
+      new ApiResponse(200, "User details", { user: getFormatedUser(req.user!) })
+    );
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
@@ -164,7 +167,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
     await session.commitTransaction();
 
-    res.status(200).json(new ApiResponse(200, "Email verified", null));
+    res.status(200).json(new ApiResponse(200, "Email verified", {}));
 
     const content = welcomeEmailTemplate(user.username);
 
@@ -195,7 +198,7 @@ export const resendEmailVerification = async (req: Request, res: Response) => {
 
   await user.save();
 
-  res.status(200).json(new ApiResponse(200, "Email verification resent", null));
+  res.status(200).json(new ApiResponse(200, "Email verification resent", {}));
 
   const content = emailVerificationTemplate(
     user.username,
@@ -234,7 +237,11 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     .status(200)
     .cookie("accessToken", accessToken, cookiesOptions)
     .cookie("refreshToken", newRefreshToken, cookiesOptions)
-    .json(new ApiResponse(200, "Access token refreshed", { user }));
+    .json(
+      new ApiResponse(200, "Access token refreshed", {
+        user: getFormatedUser(user),
+      })
+    );
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
@@ -253,7 +260,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     validateBeforeSave: false,
   });
 
-  res.status(200).json(new ApiResponse(200, "Password reset email sent", null));
+  res.status(200).json(new ApiResponse(200, "Password reset email sent", {}));
 
   const content = forgotPasswordTemplate(
     user.username,
@@ -289,7 +296,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "Password reset successfully", null));
+    .json(new ApiResponse(200, "Password reset successfully", {}));
 };
 
 export const changeCurrentPassword = async (req: Request, res: Response) => {
@@ -309,5 +316,5 @@ export const changeCurrentPassword = async (req: Request, res: Response) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, "Password changed successfully", null));
+    .json(new ApiResponse(200, "Password changed successfully", {}));
 };

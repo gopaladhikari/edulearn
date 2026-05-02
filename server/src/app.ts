@@ -11,23 +11,11 @@ import { LocalStrategy } from "./strategy/local.strategy.js";
 import { JwtStrategy } from "./strategy/jwt.strategy.js";
 import { arcjectProtection } from "./middlewares/arcjet.middleware.js";
 
-// import mongoSanitize from "express-mongo-sanitize";
-// import rateLimit from "express-rate-limit";
-
 const app = express();
 
-// Rate limitin
-// app.use(
-//   "/api",
-//   rateLimit({
-//     windowMs: 15 * 60 * 1000, // 15 minutes
-//     limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
-//     message: "Too many request from this IP address, please try again later.",
-//     standardHeaders: "draft-8",
-//     legacyHeaders: false,
-//     ipv6Subnet: 56,
-//   })
-// );
+// Proxy
+
+app.set("trust proxy", true);
 
 // passport
 
