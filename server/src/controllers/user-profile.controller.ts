@@ -29,9 +29,11 @@ export const updateProfile = async (req: Request, res: Response) => {
 
   if (!profile) throw new ApiError(400, "Profile not found.");
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, "Profile updated successfully.", { user }));
+  return res.status(200).json(
+    new ApiResponse(200, "Profile updated successfully.", {
+      user,
+    })
+  );
 };
 
 export const updateAvatar = async (req: Request, res: Response) => {
@@ -48,14 +50,25 @@ export const updateAvatar = async (req: Request, res: Response) => {
   const previousAvatar = user.profile.avatar.secure_url;
   const previoudAvatarId = user.profile.avatar.public_id;
 
-  user.profile.avatar.secure_url = result.secure_url;
-  user.profile.avatar.public_id = result.public_id;
+  const updatedUser = await UserProfile.findOneAndUpdate(
+    { user: user._id },
+    {
+      $set: {
+        avatar: {
+          secure_url: result.secure_url,
+          public_id: result.public_id,
+        },
+      },
+    }
+  );
 
-  await user.save();
+  if (!updatedUser) throw new ApiError(400, "User not found.");
 
-  res
-    .status(200)
-    .json(new ApiResponse(200, "Avatar updated successfully", null));
+  res.status(200).json(
+    new ApiResponse(200, "Avatar updated successfully", {
+      user,
+    })
+  );
 
   if (previousAvatar !== defaultAvatar) deleteMedia(previoudAvatarId);
 };

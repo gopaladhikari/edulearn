@@ -10,7 +10,6 @@ import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
 import { welcomeEmailTemplate } from "@/emails/welcome-after-verification.email.js";
 import { UserProfile } from "@/models/user-profile.model.js";
 import mongoose from "mongoose";
-import { getFormatedUser } from "@/utils/get-formated-user.js";
 
 // Generate access and refresh tokens
 const generateAccessAndRefreshTokens = async (user: Express.User) => {
@@ -90,7 +89,7 @@ export const loginUser = async (req: Request, res: Response) => {
     .cookie("refreshToken", refreshToken, cookiesOptions)
     .json(
       new ApiResponse(200, "User logged in successfully", {
-        user: getFormatedUser(user),
+        user,
         accessToken,
         refreshToken,
       })
@@ -115,11 +114,11 @@ export const logoutUser = async (req: Request, res: Response) => {
 };
 
 export const getCurrentUser = async (req: Request, res: Response) => {
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, "User details", { user: getFormatedUser(req.user!) })
-    );
+  return res.status(200).json(
+    new ApiResponse(200, "User details fetched successfully.", {
+      user: req.user,
+    })
+  );
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
@@ -237,11 +236,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     .status(200)
     .cookie("accessToken", accessToken, cookiesOptions)
     .cookie("refreshToken", newRefreshToken, cookiesOptions)
-    .json(
-      new ApiResponse(200, "Access token refreshed", {
-        user: getFormatedUser(user),
-      })
-    );
+    .json(new ApiResponse(200, "Access token refreshed", { user }));
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
