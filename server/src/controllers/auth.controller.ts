@@ -1,9 +1,9 @@
 import { User } from "@/models/user.model.js";
 import { ApiError, ApiResponse } from "@/utils/api-responses.js";
 import crypto from "crypto";
-import type { CookieOptions, Request, Response } from "express";
+import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { clientUrl, defaultAvatar } from "@/utils/constants.js";
+import { clientUrl, cookiesOptions, defaultAvatar } from "@/utils/constants.js";
 import { sendEmail } from "@/utils/send-email.js";
 import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
 import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
@@ -19,18 +19,11 @@ const generateAccessAndRefreshTokens = async (user: Express.User) => {
 
     user.refreshToken = refreshToken;
 
-    await user.save({ validateBeforeSave: false });
-
     return { accessToken, refreshToken };
   } catch (error) {
     const err = error as Error;
     throw new ApiError(400, err.message);
   }
-};
-
-const cookiesOptions: CookieOptions = {
-  httpOnly: true,
-  secure: true,
 };
 
 // Register new user
@@ -82,6 +75,8 @@ export const loginUser = async (req: Request, res: Response) => {
 
   const { accessToken, refreshToken } =
     await generateAccessAndRefreshTokens(user);
+
+  await user.save();
 
   return res
     .status(200)
@@ -251,9 +246,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
   user.forgotPasswordToken = hashToken;
   user.forgotPasswordExpires = new Date(tokenExpiry);
 
-  await user.save({
-    validateBeforeSave: false,
-  });
+  await user.save();
 
   res.status(200).json(new ApiResponse(200, "Password reset email sent", {}));
 

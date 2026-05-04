@@ -1,4 +1,16 @@
+import type { CookieOptions } from "express";
+
 export const appName = "edulearn";
+
+export const clientUrl = "http://localhost:5173";
+
+export const defaultAvatar = "./public/default-avatar.svg";
+
+export const cookiesOptions: CookieOptions = {
+  httpOnly: true,
+  secure: true,
+  maxAge: 1 * 24 * 60 * 60 * 1000,
+};
 
 export enum UserRoles {
   ADMIN = "admin",
@@ -43,6 +55,3 @@ export enum instructorApplicationStatus {
   ACCEPTED = "accepted",
   REJECTED = "rejected",
 }
-
-export const clientUrl = "http://localhost:5173";
-export const defaultAvatar = "./public/default-avatar.svg";
