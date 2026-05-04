@@ -1,6 +1,4 @@
-import axios from "axios";
 import { useLoaderData, type LoaderFunction } from "react-router";
-import { api } from "~/lib/axios";
 
 type User = {
   _id: string;
@@ -9,13 +7,10 @@ type User = {
   role: "student" | "admin";
 };
 
-export const loader: LoaderFunction = async () => {
-  const { data } = await axios.get<User>("/health");
-  data.data._id;
-};
-
 export default function Home() {
-  const data = useLoaderData();
-
-  return <div className="flex min-h-svh p-6"></div>;
+  return (
+    <div className="flex min-h-svh p-6">
+      <h1>Welcome to EduLearn!</h1>
+    </div>
+  );
 }
