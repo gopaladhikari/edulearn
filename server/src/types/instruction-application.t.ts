@@ -6,6 +6,7 @@ interface SocialLinks {
   youtube: string;
   linkedin: string;
   website: string;
+  x: string;
 }
 
 export interface InstructorDetails {
