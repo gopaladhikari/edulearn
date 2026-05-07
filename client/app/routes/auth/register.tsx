@@ -1,8 +1,17 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router";
+import { useState } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import {
+  Link,
+  useNavigation,
+  useSubmit,
+  type ActionFunction,
+} from "react-router";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import { registerSchema, type RegisterSchema } from "~/schemas/user.schema";
 
 export function meta() {
   return [
@@ -11,10 +20,34 @@ export function meta() {
   ];
 }
 
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+
+  console.log(formData);
+
+  return null;
+};
+
 export default function Register() {
-  const showPassword = true;
-  const isLoading = false;
-  const showConfirmPassword = true;
+  const [showPassword, setShowPassword] = useState(true);
+
+  const navigation = useNavigation();
+
+  const submit = useSubmit();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit: SubmitHandler<RegisterSchema> = (data) => {
+    submit(data);
+  };
+
+  const isLoading = navigation.state === "submitting";
 
   return (
     <div className="w-full max-w-md">
@@ -26,21 +59,21 @@ export default function Register() {
           Join thousands of students learning with Edulearn
         </p>
 
-        <form className="space-y-4">
-          {/* Full Name Field */}
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-2">
             <label
-              htmlFor="name"
+              htmlFor="username"
               className="block text-sm font-medium text-foreground"
             >
-              Full name
+              username
             </label>
             <Input
-              id="name"
+              id="username"
+              aria-invalid={errors.username ? "true" : "false"}
               type="text"
               placeholder="John Doe"
               className="w-full"
-              required
+              {...register("username")}
             />
           </div>
 
@@ -57,7 +90,8 @@ export default function Register() {
               type="email"
               placeholder="you@example.com"
               className="w-full"
-              required
+              aria-invalid={errors.email ? "true" : "false"}
+              {...register("email")}
             />
           </div>
 
@@ -75,11 +109,13 @@ export default function Register() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter a strong password"
                 className="w-full pr-10"
-                required
+                aria-invalid={errors.password ? "true" : "false"}
+                {...register("password")}
               />
               <button
                 type="button"
                 className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5" />
@@ -89,59 +125,6 @@ export default function Register() {
               </button>
             </div>
           </div>
-
-          {/* Confirm Password Field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="confirm-password"
-              className="block text-sm font-medium text-foreground"
-            >
-              Confirm password
-            </label>
-            <div className="relative">
-              <Input
-                id="confirm-password"
-                placeholder="Confirm your password"
-                className="w-full pr-10"
-                required
-              />
-              <button
-                type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Terms Checkbox */}
-          <label className="flex cursor-pointer items-start gap-2">
-            <input
-              type="checkbox"
-              className="mt-1 h-4 w-4 rounded border-border"
-              required
-            />
-            <span className="text-sm text-foreground">
-              I agree to the{" "}
-              <Link
-                to="/terms-and-conditions"
-                className="text-primary hover:underline"
-              >
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link
-                to="/privacy-policy"
-                className="text-primary hover:underline"
-              >
-                Privacy Policy
-              </Link>
-            </span>
-          </label>
 
           {/* Sign Up Button */}
           <Button

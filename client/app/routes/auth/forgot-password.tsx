@@ -1,8 +1,20 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Mail } from "lucide-react";
-import { Link } from "react-router";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import {
+  Link,
+  useActionData,
+  useNavigation,
+  type ActionFunction,
+  useSubmit,
+} from "react-router";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import {
+  forgotPasswordSchema,
+  type ForgotPasswordSchema,
+} from "~/schemas/user.schema";
 
 export function meta() {
   return [
@@ -11,9 +23,34 @@ export function meta() {
   ];
 }
 
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+
+  console.log(formData);
+
+  return true;
+};
+
 export default function ForgotPassword() {
-  const isSubmitted = false;
-  const isLoading = false;
+  const navigator = useNavigation();
+
+  const submit = useSubmit();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(forgotPasswordSchema),
+  });
+
+  const isSubmitted = useActionData<boolean>();
+
+  const isSubmitting = navigator.state === "submitting";
+
+  const onSubmit: SubmitHandler<ForgotPasswordSchema> = async (data) => {
+    submit(data, { method: "post" });
+  };
 
   return (
     <div className="w-full max-w-md">
@@ -28,7 +65,7 @@ export default function ForgotPassword() {
               your password
             </p>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               {/* Email Field */}
               <div className="space-y-2">
                 <label
@@ -41,8 +78,8 @@ export default function ForgotPassword() {
                   id="email"
                   type="email"
                   placeholder="you@example.com"
-                  className="w-full"
-                  required
+                  aria-invalid={errors.email ? "true" : "false"}
+                  {...register("email")}
                 />
               </div>
 
@@ -50,9 +87,9 @@ export default function ForgotPassword() {
               <Button
                 type="submit"
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                disabled={isLoading}
+                disabled={isSubmitting}
               >
-                {isLoading ? "Sending..." : "Send reset link"}
+                {isSubmitting ? "Sending..." : "Send reset link"}
               </Button>
             </form>
 

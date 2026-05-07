@@ -1,8 +1,17 @@
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
-import { Link, type ActionFunction } from "react-router";
+import {
+  Link,
+  type ActionFunction,
+  useSubmit,
+  useNavigation,
+} from "react-router";
 import { Button } from "~/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { loginSchema, type LoginSchema } from "~/schemas/user.schema";
+import { useState } from "react";
 
 export function meta() {
   return [
@@ -14,14 +23,32 @@ export function meta() {
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
 
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   console.log(formData);
 
   return null;
 };
 
 export default function Login() {
-  const showPassword = true;
-  const isLoading = false;
+  const [showPassword, setShowPassword] = useState(false);
+  const navigator = useNavigation();
+
+  const submit = useSubmit();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const isSubmitting = navigator.state === "submitting";
+
+  const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
+    submit(data, { method: "post" });
+  };
 
   return (
     <div className="w-full max-w-md">
@@ -33,7 +60,7 @@ export default function Login() {
           Sign in to your account to continue learning
         </p>
 
-        <form className="space-y-4" method="post">
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Email Field */}
           <div className="space-y-2">
             <label
@@ -45,12 +72,17 @@ export default function Login() {
             <Input
               id="email"
               type="email"
-              name="email"
+              aria-invalid={errors.email ? "true" : "false"}
               placeholder="you@example.com"
-              className="w-full"
-              required
+              {...register("email")}
             />
           </div>
+
+          {errors.email?.message && (
+            <p className="mt-1 text-sm text-destructive" id="email-error">
+              {errors.email.message}
+            </p>
+          )}
 
           {/* Password Field */}
           <div className="space-y-2">
@@ -63,15 +95,16 @@ export default function Login() {
             <div className="relative">
               <Input
                 id="password"
-                name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                className="w-full pr-10"
-                required
+                aria-invalid={errors.password ? "true" : "false"}
+                {...register("password")}
               />
+
               <button
                 type="button"
                 className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
                   <EyeOff className="h-5 w-5" />
@@ -80,33 +113,20 @@ export default function Login() {
                 )}
               </button>
             </div>
-          </div>
-
-          {/* Remember & Forgot Password */}
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex cursor-pointer items-center gap-2">
-              <input
-                type="checkbox"
-                name="remember"
-                className="h-4 w-4 rounded border-border"
-              />
-              <span className="text-foreground">Remember me</span>
-            </label>
-            <Link
-              to="/forgot-password"
-              className="text-primary hover:underline"
-            >
-              Forgot password?
-            </Link>
+            {errors.password?.message && (
+              <p className="mt-1 text-sm text-destructive" id="password-error">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
           {/* Sign In Button */}
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={isLoading}
+            disabled={isSubmitting}
           >
-            {isLoading ? "Signing in..." : "Sign in"}
+            {isSubmitting ? "Signing in..." : "Sign in"}
           </Button>
         </form>
 
