@@ -1,10 +1,11 @@
 {
   "include": [
-    "**/*",
-    "**/.server/**/*",
-    "**/.client/**/*",
+    "**/*.ts",
+    "**/*.tsx",
     ".react-router/types/**/*",
-    "axios.d.ts"
+    "axios.d.ts",
+    "./app/*/*.ts",
+    "./app/*/*.tsx"
   ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],

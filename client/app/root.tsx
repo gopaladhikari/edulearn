@@ -8,6 +8,8 @@ import {
 } from "react-router";
 import type { Route } from "./+types/root";
 import "./app.css";
+import { Header } from "./components/header";
+import { Footer } from "./components/footer";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -19,7 +21,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <Header />
         {children}
+        <Footer />
         <ScrollRestoration />
         <Scripts />
       </body>
