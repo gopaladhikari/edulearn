@@ -46,7 +46,7 @@ export default function Login() {
 
   const isSubmitting = navigator.state === "submitting";
 
-  const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
+  const onSubmit: SubmitHandler<LoginSchema> = (data) => {
     submit(data, { method: "post" });
   };
 
