@@ -24,7 +24,7 @@ export function meta() {
   ];
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const clientAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
 
   console.log(formData);

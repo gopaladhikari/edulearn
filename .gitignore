@@ -157,3 +157,4 @@ sketch
 
 .react-router/
 build
+.netlify
