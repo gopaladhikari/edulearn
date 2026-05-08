@@ -7,6 +7,12 @@ export type ApiSuccess<T = any> = {
   data: T;
 };
 
+export type ApiError = {
+  status: number;
+  success: false;
+  message: string;
+};
+
 declare module "axios" {
   export interface CustomResponse<T = any> extends AxiosResponse {
     data: ApiSuccess<T>;

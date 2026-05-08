@@ -8,6 +8,7 @@ import {
   useNavigation,
   useActionData,
   redirect,
+  data,
 } from "react-router";
 import { Button } from "~/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +16,8 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { loginSchema, type LoginSchema } from "~/schemas/user.schema";
 import { useState } from "react";
 import { api } from "~/lib/axios";
-import type { ApiSuccess } from "../../../types/axios.t";
+import type { ApiError } from "../../../types/axios.t";
+import { isAxiosError } from "axios";
 
 export function meta() {
   return [
@@ -24,19 +26,24 @@ export function meta() {
   ];
 }
 
-export const clientAction: ActionFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ request }) => {
   const url = new URL(request.url);
   const redirectTo = url.searchParams.get("redirectTo") || "/";
 
   try {
     const formData = await request.formData();
 
-    const { data } = await api.get("/health");
-    console.log(data);
-    // if (data.success) redirect(redirectTo);
+    await api.post("/user/login", formData);
+
+    return redirect(redirectTo);
   } catch (error) {
-    console.log(error);
-    return error;
+    if (isAxiosError(error))
+      return data(error.response?.data, {
+        status: error.response?.status,
+      });
+    return data(error, {
+      status: 500,
+    });
   }
 };
 
@@ -44,11 +51,9 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigator = useNavigation();
 
-  const actionData = useActionData<ApiSuccess | Error>();
+  const actionData = useActionData<ApiError>();
 
   const submit = useSubmit();
-
-  console.log(actionData);
 
   const {
     register,
@@ -63,6 +68,8 @@ export default function Login() {
   const onSubmit: SubmitHandler<LoginSchema> = (data) => {
     submit(data, { method: "post" });
   };
+
+  console.log(actionData);
 
   return (
     <div className="w-full max-w-md">
@@ -133,6 +140,12 @@ export default function Login() {
               </p>
             )}
           </div>
+
+          {!actionData?.success && (
+            <p className="mt-1 text-sm text-destructive" id="email-error">
+              {actionData?.message}
+            </p>
+          )}
 
           {/* Sign In Button */}
           <Button

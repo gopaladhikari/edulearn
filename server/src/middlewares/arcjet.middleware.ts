@@ -33,7 +33,7 @@ const signUpProtection = arcjet({
       },
 
       bots: {
-        mode: "LIVE",
+        mode: "DRY_RUN",
         allow: ["POSTMAN"],
       },
 
@@ -53,7 +53,7 @@ const aj = arcjet({
     shield({ mode: "LIVE" }),
 
     detectBot({
-      mode: "LIVE",
+      mode: "DRY_RUN",
       allow: ["CATEGORY:SEARCH_ENGINE", "POSTMAN"],
     }),
 
