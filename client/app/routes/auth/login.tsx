@@ -6,12 +6,16 @@ import {
   type ActionFunction,
   useSubmit,
   useNavigation,
+  useActionData,
+  redirect,
 } from "react-router";
 import { Button } from "~/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { loginSchema, type LoginSchema } from "~/schemas/user.schema";
 import { useState } from "react";
+import { api } from "~/lib/axios";
+import type { ApiSuccess } from "../../../types/axios.t";
 
 export function meta() {
   return [
@@ -20,21 +24,31 @@ export function meta() {
   ];
 }
 
-export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
+export const clientAction: ActionFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const redirectTo = url.searchParams.get("redirectTo") || "/";
 
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  try {
+    const formData = await request.formData();
 
-  console.log(formData);
-
-  return null;
+    const { data } = await api.get("/health");
+    console.log(data);
+    // if (data.success) redirect(redirectTo);
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 };
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigator = useNavigation();
 
+  const actionData = useActionData<ApiSuccess | Error>();
+
   const submit = useSubmit();
+
+  console.log(actionData);
 
   const {
     register,

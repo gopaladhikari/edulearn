@@ -1,10 +1,15 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
-import { Button } from "./ui/button";
+import { Link, useLocation } from "react-router";
+import { buttonVariants } from "./ui/button";
+import { cn } from "~/lib/utils";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+
+  const location = useLocation();
+
+  const redirectTo = location.pathname;
 
   return (
     <header className="border-b border-border bg-card">
@@ -44,21 +49,16 @@ export function Header() {
             Privacy
           </Link>
         </div>
-
         {/* Auth Buttons - Desktop */}
         <div className="hidden items-center gap-3 md:flex">
-          <Link to="/login">
-            <Button
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary/5"
-            >
-              Log in
-            </Button>
+          <Link
+            to={`/login?redirectTo=${redirectTo}`}
+            className={cn(buttonVariants({ variant: "secondary" }))}
+          >
+            Log in
           </Link>
-          <Link to="/register">
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
-              Sign up
-            </Button>
+          <Link to="/register" className={cn(buttonVariants())}>
+            Sign up
           </Link>
         </div>
 
@@ -107,17 +107,10 @@ export function Header() {
             </Link>
             <div className="flex flex-col gap-2 border-t border-border pt-4">
               <Link to="/auth/login" className="w-full">
-                <Button
-                  variant="outline"
-                  className="w-full border-primary text-primary"
-                >
-                  Log in
-                </Button>
+                Log in
               </Link>
               <Link to="/auth/register" className="w-full">
-                <Button className="w-full bg-primary text-primary-foreground">
-                  Sign up
-                </Button>
+                Sign up
               </Link>
             </div>
           </div>
