@@ -41,9 +41,17 @@ export const clientAction: ActionFunction = async ({ request }) => {
       return data(error.response?.data, {
         status: error.response?.status,
       });
-    return data(error, {
-      status: 500,
-    });
+
+    return data(
+      {
+        success: false,
+        message: "Something went wrong while logging in.",
+        error: error,
+      },
+      {
+        status: 500,
+      }
+    );
   }
 };
 
@@ -139,9 +147,9 @@ export default function Login() {
             )}
           </div>
 
-          {!actionData?.success && (
-            <p className="mt-1 text-sm text-destructive" id="email-error">
-              {actionData?.message}
+          {actionData?.success === false && (
+            <p className="mt-1 text-sm text-destructive">
+              {actionData.message}
             </p>
           )}
 

@@ -30,7 +30,6 @@ app.use(
       "Authorization",
       "X-Requested-With",
       "device-remember-token",
-      "Access-Control-Allow-Origin",
       "Origin",
       "Accept",
     ],
