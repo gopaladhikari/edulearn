@@ -11,6 +11,18 @@ import type { NextFunction, Request, Response } from "express";
 import { ApiError } from "@/utils/api-responses.js";
 import { findIp } from "@arcjet/ip";
 
+const getClientIp = (req: Request): string => {
+  const forwardedFor = req.headers["x-forwarded-for"];
+
+  if (typeof forwardedFor === "string")
+    return forwardedFor.split(",")[0]?.trim() || "";
+
+  if (Array.isArray(forwardedFor))
+    return forwardedFor[0]?.split(",")[0]?.trim() || "";
+
+  return req.ip || req.socket.remoteAddress || "127.0.0.1";
+};
+
 const signUpProtection = arcjet({
   key: process.env.ARCJET_KEY!,
   rules: [
@@ -93,7 +105,7 @@ export const arcjectProtection = async (
   _res: Response,
   next: NextFunction
 ) => {
-  const ip = findIp(req);
+  const ip = findIp(req) || getClientIp(req) || "127.0.0.1";
 
   const decision = await aj.protect(req, { requested: 1, ip });
 
@@ -108,7 +120,8 @@ export const arcjetSignUpProtection = async (
   next: NextFunction
 ) => {
   const { email } = req.body;
-  const ip = findIp(req);
+
+  const ip = findIp(req) || getClientIp(req) || "127.0.0.1";
 
   const decision = await signUpProtection.protect(req, {
     email,
