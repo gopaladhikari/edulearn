@@ -71,7 +71,7 @@ export default function Register() {
               id="username"
               aria-invalid={errors.username ? "true" : "false"}
               type="text"
-              placeholder="John Doe"
+              placeholder="edulearn"
               className="w-full"
               {...register("username")}
             />
@@ -88,7 +88,7 @@ export default function Register() {
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder="edulearn@example.com"
               className="w-full"
               aria-invalid={errors.email ? "true" : "false"}
               {...register("email")}

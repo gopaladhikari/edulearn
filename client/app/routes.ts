@@ -15,4 +15,6 @@ export default [
     route("/reset-password/:token", "routes/auth/reset-password.tsx"),
     route("/verify-email/:token", "routes/auth/verify-email.tsx"),
   ]),
+
+  route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;

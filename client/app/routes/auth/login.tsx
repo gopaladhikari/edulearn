@@ -33,9 +33,12 @@ export const action: ActionFunction = async ({ request }) => {
   try {
     const formData = await request.formData();
 
-    await api.post("/user/login", formData);
+    await api.post("/api/v1/user/login", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+    });
 
-    return redirect(redirectTo);
+    return redirect(redirectTo || "/");
   } catch (error) {
     if (isAxiosError(error))
       return data(error.response?.data, {
@@ -68,8 +71,6 @@ export default function Login() {
   const onSubmit: SubmitHandler<LoginSchema> = (data) => {
     submit(data, { method: "post" });
   };
-
-  console.log(actionData);
 
   return (
     <div className="w-full max-w-md">
