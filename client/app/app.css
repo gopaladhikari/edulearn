@@ -130,6 +130,10 @@
     @apply font-sans;
   }
 
+  main {
+    @apply min-h-svh;
+  }
+
   a,
   button {
     @apply cursor-pointer;

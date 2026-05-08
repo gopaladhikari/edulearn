@@ -26,17 +26,14 @@ export function meta() {
   ];
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const clientAction: ActionFunction = async ({ request }) => {
   const url = new URL(request.url);
   const redirectTo = url.searchParams.get("redirectTo") || "/";
 
   try {
     const formData = await request.formData();
 
-    await api.post("/api/v1/user/login", {
-      email: formData.get("email"),
-      password: formData.get("password"),
-    });
+    await api.post("/api/v1/user/login", Object.fromEntries(formData));
 
     return redirect(redirectTo || "/");
   } catch (error) {
@@ -73,7 +70,7 @@ export default function Login() {
   };
 
   return (
-    <div className="w-full max-w-md">
+    <section className="w-full max-w-md">
       <Card className="p-8">
         <h1 className="mb-2 text-3xl font-bold text-foreground">
           Welcome back
@@ -198,6 +195,6 @@ export default function Login() {
           </Link>
         </p>
       </div>
-    </div>
+    </section>
   );
 }

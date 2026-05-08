@@ -10,6 +10,7 @@ import passport from "passport";
 import { LocalStrategy } from "./strategy/local.strategy.js";
 import { JwtStrategy } from "./strategy/jwt.strategy.js";
 import { arcjectProtection } from "./middlewares/arcjet.middleware.js";
+import { clientUrl } from "./utils/constants.js";
 
 const app = express();
 
@@ -17,26 +18,8 @@ const app = express();
 
 app.set("trust proxy", true);
 
-// passport
+// cors
 
-app.use(passport.initialize());
-LocalStrategy(passport);
-JwtStrategy(passport);
-
-// Helmet
-app.use(helmet());
-
-// Arcject
-app.use(arcjectProtection);
-
-// Body parser
-
-app.use(express.json({ limit: "10kb" }));
-// app.use(mongoSanitize());
-app.use(express.urlencoded({ limit: "10kb", extended: true }));
-app.use(hpp());
-app.use(cookieParser());
-app.use(express.static("public"));
 app.use(
   cors({
     origin: [clientUrl, "http://localhost:5173"],
@@ -54,6 +37,25 @@ app.use(
   })
 );
 
+// 2. Security / Protection
+app.use(helmet());
+app.use(arcjectProtection);
+
+// passport
+
+app.use(passport.initialize());
+LocalStrategy(passport);
+JwtStrategy(passport);
+
+// Body parser
+
+app.use(express.json({ limit: "10kb" }));
+// app.use(mongoSanitize());
+app.use(express.urlencoded({ limit: "10kb", extended: true }));
+app.use(hpp());
+app.use(cookieParser());
+app.use(express.static("public"));
+
 // Logging
 if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
@@ -62,7 +64,6 @@ if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 import { authRouter } from "./routes/auth.route.js";
 import { healthCheckRouter } from "./routes/healthcheck.route.js";
 import { userProfileRouter } from "./routes/user-profile.route.js";
-import { clientUrl } from "./utils/constants.js";
 
 app.use("/health", healthCheckRouter);
 

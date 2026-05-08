@@ -20,7 +20,7 @@ export function meta() {
   ];
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const clientAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
 
   console.log(formData);
@@ -50,7 +50,7 @@ export default function Register() {
   const isLoading = navigation.state === "submitting";
 
   return (
-    <div className="w-full max-w-md">
+    <section className="w-full max-w-md">
       <Card className="p-8">
         <h1 className="mb-2 text-3xl font-bold text-foreground">
           Create account
@@ -159,6 +159,6 @@ export default function Register() {
           </Button>
         </Link>
       </Card>
-    </div>
+    </section>
   );
 }

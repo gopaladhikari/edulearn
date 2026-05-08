@@ -2,7 +2,7 @@ import type { CookieOptions } from "express";
 
 export const appName = "edulearn";
 
-export const clientUrl = "https://edulearn-gopuadks.netlify.app/";
+export const clientUrl = "https://edulearn-gopuadks.netlify.app";
 
 export const defaultAvatar = "./public/default-avatar.svg";
 
@@ -10,6 +10,7 @@ export const cookiesOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
   maxAge: 1 * 24 * 60 * 60 * 1000,
+  sameSite: "none",
 };
 
 export enum UserRoles {
