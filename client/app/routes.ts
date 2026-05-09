@@ -16,5 +16,12 @@ export default [
     route("/verify-email/:token", "routes/auth/verify-email.tsx"),
   ]),
 
+  layout("routes/user/layout.tsx", [
+    route("/profile", "routes/user/profile.tsx"),
+    route("/wishlist", "routes/user/wishlist.tsx"),
+    route("/cart", "routes/user/cart.tsx"),
+    route("/notifications", "routes/user/notification.tsx"),
+  ]),
+
   route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;

@@ -11,6 +11,7 @@ export type ApiError = {
   status: number;
   success: false;
   message: string;
+  error: unknown;
 };
 
 declare module "axios" {

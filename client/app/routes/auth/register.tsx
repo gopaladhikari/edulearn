@@ -11,6 +11,8 @@ import {
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
+import { api } from "~/lib/axios";
+import { handleActionError } from "~/lib/utils";
 import { registerSchema, type RegisterSchema } from "~/schemas/user.schema";
 
 export function meta() {
@@ -21,11 +23,18 @@ export function meta() {
 }
 
 export const clientAction: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
+  try {
+    const formData = await request.formData();
 
-  console.log(formData);
+    const { data } = await api.post(
+      "/api/v1/user/register",
+      Object.fromEntries(formData)
+    );
 
-  return null;
+    return data;
+  } catch (error) {
+    return handleActionError(error);
+  }
 };
 
 export default function Register() {

@@ -8,7 +8,6 @@ import {
   useNavigation,
   useActionData,
   redirect,
-  data,
 } from "react-router";
 import { Button } from "~/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,9 +15,9 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { loginSchema, type LoginSchema } from "~/schemas/user.schema";
 import { useState } from "react";
 import { api } from "~/lib/axios";
-import { isAxiosError } from "axios";
-import type { ApiError } from "../../../types/axios.t";
+import type { ApiError, ApiSuccess } from "../../../types/axios.t";
 import { useUserStore } from "~/store/userStore";
+import { handleActionError } from "~/lib/utils";
 
 export function meta() {
   return [
@@ -48,28 +47,7 @@ export const clientAction: ActionFunction = async ({ request }) => {
 
     return redirect(redirectTo || "/");
   } catch (error) {
-    if (isAxiosError(error)) {
-      const message = {
-        success: false,
-        message: error.response?.data?.message || error?.message,
-        error: error,
-      };
-
-      return data(message, {
-        status: error.response?.status,
-      });
-    }
-
-    return data(
-      {
-        success: false,
-        message: "Something went wrong while logging in.",
-        error: error,
-      },
-      {
-        status: 500,
-      }
-    );
+    return handleActionError(error);
   }
 };
 
@@ -77,7 +55,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigator = useNavigation();
 
-  const actionData = useActionData<ApiError>();
+  const actionData = useActionData<ApiError | ApiSuccess>();
 
   const submit = useSubmit();
 
@@ -169,6 +147,10 @@ export default function Login() {
             <p className="mt-1 text-sm text-destructive">
               {actionData.message}
             </p>
+          )}
+
+          {actionData?.success === true && (
+            <p className="text-success mt-1 text-sm">{actionData.message}</p>
           )}
 
           {/* Sign In Button */}

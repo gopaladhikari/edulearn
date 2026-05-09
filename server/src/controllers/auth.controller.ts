@@ -149,9 +149,6 @@ export const verifyEmail = async (req: Request, res: Response) => {
       [
         {
           user: user._id,
-          avatar: {
-            secure_url: defaultAvatar,
-          },
         },
       ],
       {

@@ -35,7 +35,7 @@ function UserNav({ user }: { user: User }) {
           <span className="sr-only">Cart</span>
         </Link>
 
-        <Link to="/notification" title="Notifications">
+        <Link to="/notifications" title="Notifications">
           <Bell size={18} />
           <span className="sr-only">Notifications</span>
         </Link>
@@ -45,7 +45,7 @@ function UserNav({ user }: { user: User }) {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="rounded-full">
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="shadcn" />
+              <AvatarImage src="/default-avatar.svg" alt="shadcn" />
               <AvatarFallback>
                 {" "}
                 {user.username[0].toUpperCase()}{" "}
