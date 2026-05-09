@@ -16,14 +16,19 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { loginSchema, type LoginSchema } from "~/schemas/user.schema";
 import { useState } from "react";
 import { api } from "~/lib/axios";
-import type { ApiError } from "../../../types/axios.t";
 import { isAxiosError } from "axios";
+import type { ApiError } from "../../../types/axios.t";
+import { useUserStore } from "~/store/userStore";
 
 export function meta() {
   return [
     { title: "Login - Edulearn" },
     { name: "description", content: "Login to your account" },
   ];
+}
+
+interface Result {
+  user: User;
 }
 
 export const clientAction: ActionFunction = async ({ request }) => {
@@ -33,14 +38,27 @@ export const clientAction: ActionFunction = async ({ request }) => {
   try {
     const formData = await request.formData();
 
-    await api.post("/api/v1/user/login", Object.fromEntries(formData));
+    const result = await api.post<Result>(
+      "/api/v1/user/login",
+      Object.fromEntries(formData)
+    );
+
+    if (result.data.success)
+      useUserStore.getState().setUser(result.data.data.user);
 
     return redirect(redirectTo || "/");
   } catch (error) {
-    if (isAxiosError(error))
-      return data(error.response?.data, {
+    if (isAxiosError(error)) {
+      const message = {
+        success: false,
+        message: error.response?.data?.message || error?.message,
+        error: error,
+      };
+
+      return data(message, {
         status: error.response?.status,
       });
+    }
 
     return data(
       {

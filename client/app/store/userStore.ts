@@ -1,48 +1,30 @@
 import { create } from "zustand";
-
-export type AuthUser = {
-  _id: string;
-  id?: string;
-  username: string;
-  email: string;
-  role: "student" | "instructor" | "admin";
-  isEmailVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
+import { persist, createJSONStorage } from "zustand/middleware";
 
 type AuthState = {
-  user: AuthUser | null;
-  accessToken: string | null;
+  user: User | null;
   isAuthenticated: boolean;
-
-  setAuth: (user: AuthUser, accessToken?: string | null) => void;
-  setUser: (user: AuthUser | null) => void;
+  setUser: (user: User | null) => void;
   logout: () => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  accessToken: null,
-  isAuthenticated: false,
-
-  setAuth: (user, accessToken = null) =>
-    set({
-      user,
-      accessToken,
-      isAuthenticated: true,
-    }),
-
-  setUser: (user) =>
-    set({
-      user,
-      isAuthenticated: Boolean(user),
-    }),
-
-  logout: () =>
-    set({
+export const useUserStore = create<AuthState>()(
+  persist(
+    (set) => ({
       user: null,
-      accessToken: null,
       isAuthenticated: false,
+      setUser: (user) => set({ user, isAuthenticated: Boolean(user) }),
+      logout: () => set({ user: null, isAuthenticated: false }),
     }),
-}));
+    {
+      name: "user",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+
+export const useUser = () => useUserStore((state) => state.user);
+export const useIsAuthenticated = () =>
+  useUserStore((state) => state.isAuthenticated);
+export const useSetUser = () => useUserStore((state) => state.setUser);
+export const useLogout = () => useUserStore((state) => state.logout);
