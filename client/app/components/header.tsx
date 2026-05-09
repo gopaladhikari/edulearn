@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router";
 import { Button, buttonVariants } from "./ui/button";
 import { cn } from "~/lib/utils";
-import { useIsAuthenticated, useUser } from "~/store/userStore";
+import { useUserStore } from "~/store/userStore";
 import {
   BadgeCheckIcon,
   Bell,
@@ -100,8 +100,7 @@ export function Header() {
 
   const redirectTo = location.pathname;
 
-  const user = useUser();
-  const isAuthenticated = useIsAuthenticated();
+  const { isAuthenticated, user } = useUserStore();
 
   return (
     <header className="border-b border-border bg-card">
