@@ -23,5 +23,10 @@ export default [
     route("/notifications", "routes/user/notification.tsx"),
   ]),
 
+  route("/contact-us", "routes/public/contact-us.tsx"),
+  route("/terms-and-conditions", "routes/public/terms-and-conditions.tsx"),
+  route("/privacy-policy", "routes/public/privacy-policy.tsx"),
+  route("/teaching", "routes/public/teaching.tsx"),
+
   route("*", "routes/not-found.tsx"),
 ] satisfies RouteConfig;

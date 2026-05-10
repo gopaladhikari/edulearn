@@ -1,14 +1,9 @@
 import { Outlet } from "react-router";
 import { useUserStore } from "~/store/userStore";
 import { Navigate } from "react-router";
-import { Loading } from "~/components/loading";
 
 export default function Layout() {
-  const { isAuthenticated, isAuthChecked } = useUserStore();
-
-  if (!isAuthChecked) {
-    return <Loading />;
-  }
+  const { isAuthenticated } = useUserStore();
 
   if (isAuthenticated) return <Navigate to="/" replace />;
 

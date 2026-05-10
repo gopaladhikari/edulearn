@@ -29,16 +29,15 @@ function UserNav({ user, logout }: { user: User; logout: () => void }) {
   return (
     <div className="flex gap-8">
       <menu className="flex items-center gap-8">
+        <Link to="/teaching">Teach on EduLearn</Link>
         <Link to="/wishlist" title="Wishlist">
           <Heart size={18} />
           <span className="sr-only">Wishlist</span>
         </Link>
-
         <Link to="/cart" title="Cart">
           <ShoppingCart size={18} />
           <span className="sr-only">Cart</span>
         </Link>
-
         <Link to="/notifications" title="Notifications">
           <Bell size={18} />
           <span className="sr-only">Notifications</span>
