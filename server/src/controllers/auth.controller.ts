@@ -3,7 +3,7 @@ import { ApiError, ApiResponse } from "@/utils/api-responses.js";
 import crypto from "crypto";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { clientUrl, cookiesOptions, defaultAvatar } from "@/utils/constants.js";
+import { clientUrl, cookiesOptions } from "@/utils/constants.js";
 import { sendEmail } from "@/utils/send-email.js";
 import { emailVerificationTemplate } from "@/emails/email-verification.email.js";
 import { forgotPasswordTemplate } from "@/emails/forgot-password.email.js";
