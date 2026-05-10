@@ -1,10 +1,24 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useNavigation,
+} from "react-router";
 import { Header } from "./components/header";
 import { Footer } from "./components/footer";
 import "./app.css";
 import { GlobalError } from "./routes/error-boundary";
+import { useAuthSync } from "./hooks/sync-auth";
+import { Loading } from "./components/loading";
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const navigation = useNavigation();
+
+  // State can be "idle", "loading", or "submitting"
+  const isLoading = navigation.state === "loading";
+
   return (
     <html lang="en">
       <head>
@@ -15,7 +29,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <Header />
-        <main>{children}</main>
+
+        <main>{isLoading ? <Loading /> : children}</main>
         <Footer />
         <ScrollRestoration />
         <Scripts />
@@ -25,6 +40,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  useAuthSync();
   return <Outlet />;
 }
 

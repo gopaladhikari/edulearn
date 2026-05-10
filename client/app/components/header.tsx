@@ -21,7 +21,11 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-function UserNav({ user }: { user: User }) {
+import type { User } from "../../types/user.t";
+import { Skeleton } from "./ui/skeleton";
+import { Logo } from "./logo";
+
+function UserNav({ user, logout }: { user: User; logout: () => void }) {
   return (
     <div className="flex gap-8">
       <menu className="flex items-center gap-8">
@@ -46,10 +50,7 @@ function UserNav({ user }: { user: User }) {
           <Button variant="ghost" size="icon" className="rounded-full">
             <Avatar>
               <AvatarImage src="/default-avatar.svg" alt="shadcn" />
-              <AvatarFallback>
-                {" "}
-                {user.username[0].toUpperCase()}{" "}
-              </AvatarFallback>
+              <AvatarFallback>{user.username[0].toUpperCase()} </AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
@@ -69,7 +70,7 @@ function UserNav({ user }: { user: User }) {
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={logout}>
             <LogOutIcon />
             Sign Out
           </DropdownMenuItem>
@@ -100,23 +101,26 @@ export function Header() {
 
   const redirectTo = location.pathname;
 
-  const { isAuthenticated, user } = useUserStore();
+  const { isAuthenticated, user, logout, isAuthChecked } = useUserStore();
 
   return (
-    <header className="border-b border-border bg-card">
+    <header className="h-20 border-b border-border bg-card">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-lg font-bold text-white">
-            E
-          </div>
-          <span className="text-xl font-bold text-foreground">Edulearn</span>
-        </Link>
+        <Logo />
 
-        {isAuthenticated ? (
-          <UserNav user={user!} />
+        {isAuthChecked === false ? (
+          <div className="flex w-full max-w-45 flex-col gap-2">
+            <Skeleton className="h-2 w-full bg-gray-400" />
+            <Skeleton className="h-2 w-full bg-gray-400" />
+          </div>
         ) : (
-          <AuthNav redirectTo={redirectTo} />
+          <>
+            {isAuthenticated ? (
+              <UserNav user={user!} logout={logout} />
+            ) : (
+              <AuthNav redirectTo={redirectTo} />
+            )}
+          </>
         )}
       </nav>
     </header>

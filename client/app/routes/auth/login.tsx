@@ -18,6 +18,7 @@ import { api } from "~/lib/axios";
 import type { ApiError, ApiSuccess } from "../../../types/axios.t";
 import { useUserStore } from "~/store/userStore";
 import { handleActionError } from "~/lib/utils";
+import type { User } from "../../../types/user.t";
 
 export function meta() {
   return [
