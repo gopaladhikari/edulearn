@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Eye, EyeOff } from "lucide-react";
+import { Check, Eye, EyeOff, X } from "lucide-react";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import {
@@ -17,6 +17,7 @@ import {
   type ResetPasswordSchema,
 } from "~/schemas/user.schema";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
+import { getPasswordRequirements } from "~/lib/utils";
 
 export function meta() {
   return [
@@ -50,6 +51,7 @@ export default function ResetPassword() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm({
     resolver: zodResolver(resetPasswordSchema),
   });
@@ -57,6 +59,10 @@ export default function ResetPassword() {
   const onSubmit: SubmitHandler<ResetPasswordSchema> = (data) => {
     submit(data);
   };
+
+  const password = watch("newPassword");
+
+  const passwordRequirements = getPasswordRequirements(password);
 
   return (
     <div className="w-full max-w-md">
@@ -72,74 +78,148 @@ export default function ResetPassword() {
 
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               {/* Password Field */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-foreground"
-                >
-                  New password
-                </label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Enter a strong password"
-                    className="w-full pr-10"
-                    aria-invalid={errors.newPassword ? "true" : "false"}
-                    {...register("newPassword")}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
+              <FieldGroup className="space-y-6">
+                {/* Password Field */}
+                <Field>
+                  <FieldLabel htmlFor="reset-password">New password</FieldLabel>
+                  <div className="relative">
+                    <Input
+                      id="reset-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your new password"
+                      {...register("newPassword")}
+                      aria-invalid={!!errors.newPassword}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.newPassword && (
+                    <p className="mt-2 text-sm text-destructive">
+                      {errors.newPassword.message}
+                    </p>
+                  )}
 
-              {/* Confirm Password Field */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="confirm-password"
-                  className="block text-sm font-medium text-foreground"
-                >
-                  Confirm password
-                </label>
-                <div className="relative">
-                  <Input
-                    id="confirm-password"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
-                    className="w-full pr-10"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
+                  {/* Password Requirements */}
+                  <div className="mt-3 space-y-1 text-sm">
+                    <div className="flex items-center gap-2">
+                      {passwordRequirements.minLength ? (
+                        <Check className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <X className="h-4 w-4 text-destructive" />
+                      )}
+                      <span
+                        className={
+                          passwordRequirements.minLength
+                            ? "text-green-600"
+                            : "text-muted-foreground"
+                        }
+                      >
+                        At least 8 characters
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passwordRequirements.hasUppercase ? (
+                        <Check className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <X className="h-4 w-4 text-destructive" />
+                      )}
+                      <span
+                        className={
+                          passwordRequirements.hasUppercase
+                            ? "text-green-600"
+                            : "text-muted-foreground"
+                        }
+                      >
+                        One uppercase letter
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passwordRequirements.hasLowercase ? (
+                        <Check className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <X className="h-4 w-4 text-destructive" />
+                      )}
+                      <span
+                        className={
+                          passwordRequirements.hasLowercase
+                            ? "text-green-600"
+                            : "text-muted-foreground"
+                        }
+                      >
+                        One lowercase letter
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {passwordRequirements.hasNumber ? (
+                        <Check className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <X className="h-4 w-4 text-destructive" />
+                      )}
+                      <span
+                        className={
+                          passwordRequirements.hasNumber
+                            ? "text-green-600"
+                            : "text-muted-foreground"
+                        }
+                      >
+                        One number
+                      </span>
+                    </div>
+                  </div>
+                </Field>
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                disabled={isLoading}
-              >
-                {isLoading ? "Resetting..." : "Reset password"}
-              </Button>
+                {/* Confirm Password Field */}
+                <Field>
+                  <FieldLabel htmlFor="reset-confirmPassword">
+                    Confirm password
+                  </FieldLabel>
+                  <div className="relative">
+                    <Input
+                      id="reset-confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Re-enter your password"
+                      {...register("confirmPassword")}
+                      aria-invalid={!!errors.confirmPassword}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && (
+                    <p className="mt-2 text-sm text-destructive">
+                      {errors.confirmPassword.message}
+                    </p>
+                  )}
+                </Field>
+
+                {/* Reset Button */}
+                <Button
+                  type="submit"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Resetting..." : "Reset password"}
+                </Button>
+              </FieldGroup>
             </form>
           </>
         ) : (

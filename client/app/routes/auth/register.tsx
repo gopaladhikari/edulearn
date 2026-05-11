@@ -17,6 +17,7 @@ import { handleActionError } from "~/lib/utils";
 import { registerSchema, type RegisterSchema } from "~/schemas/user.schema";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Checkbox } from "~/components/ui/checkbox";
+import { getPasswordRequirements } from "~/lib/utils";
 
 export function meta() {
   return [
@@ -75,12 +76,7 @@ export default function Register() {
 
   const password = watch("password");
 
-  const passwordRequirements = {
-    minLength: password.length >= 8,
-    hasUppercase: /[A-Z]/.test(password),
-    hasLowercase: /[a-z]/.test(password),
-    hasNumber: /[0-9]/.test(password),
-  };
+  const passwordRequirements = getPasswordRequirements(password);
 
   return (
     <section className="w-full max-w-md">
