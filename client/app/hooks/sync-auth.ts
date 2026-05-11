@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent } from "react";
+import { useEffect, useEffectEvent, useRef } from "react";
 import { isAxiosError } from "axios";
 import { useUserStore } from "~/store/userStore";
 import { api } from "~/lib/axios";
@@ -10,27 +10,18 @@ type Result = {
 
 const refreshAccessToken = async () => {
   const response = await api.post("/api/v1/user/refresh-token");
-  console.log("refresh token", response);
   return response.data;
 };
 
 const getCurrentUser = async () => {
   const response = await api.get<Result>("/api/v1/user/current-user");
-  console.log("current user", response);
   return response.data.data.user;
 };
 
-// User logged in -> auth store, store is lost after closing browser
-// User logged out -> clean auth store
-// user refreshed page -> persistan handles it
-
-// user unauthorized.
-// Refresh token
-// set user
-//  if not clean the store
-
 export function useAuthSync() {
   const { setUser, logout, setAuthChecked } = useUserStore();
+
+  const hasRun = useRef(false);
 
   const authEvent = useEffectEvent(async () => {
     try {
@@ -39,7 +30,7 @@ export function useAuthSync() {
     } catch (error) {
       if (isAxiosError(error) && error.response?.status === 401) {
         try {
-          console.log(error.response.data);
+          console.log("error", error.response.data);
           await refreshAccessToken();
 
           const currentUser = await getCurrentUser();
@@ -56,6 +47,10 @@ export function useAuthSync() {
   });
 
   useEffect(() => {
+    if (hasRun.current) return;
+
+    hasRun.current = true;
+
     authEvent();
   }, []);
 }
