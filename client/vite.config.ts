@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
         name: "generate-redirects",
         closeBundle() {
           const outDir = path.resolve(process.cwd(), "build/client");
-          const fileContent = `/api/*  ${apiUrl}/:splat  200!\n`;
+          const fileContent = `/api/*  ${apiUrl}/api/:splat  200!\n/*  /index.html  200\n`;
 
           if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
