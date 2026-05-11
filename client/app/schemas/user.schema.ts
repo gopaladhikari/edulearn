@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const username = z
   .string()
-  .min(4, "Username must be at least 4 characters")
+  .min(6, "Username must be at least 6 characters")
   .max(20, "Username must be at most 20 characters")
   .lowercase()
   .trim();
@@ -11,16 +11,26 @@ const email = z.email("Email is required").trim();
 
 const password = z
   .string()
-  .min(6, "Password must be at least 6 characters")
-  .max(20, "Password must be at most 20 characters")
-  .trim();
+  .min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number");
 
 // Register
-export const registerSchema = z.object({
-  username,
-  email,
-  password,
-});
+export const registerSchema = z
+  .object({
+    username,
+    email: z.email("Please enter a valid email address"),
+    password: password,
+    confirmPassword: z.string(),
+    terms: z.boolean().refine((val) => val === true, {
+      message: "You must agree to the terms and conditions",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 // Login
 export const loginSchema = z.object({

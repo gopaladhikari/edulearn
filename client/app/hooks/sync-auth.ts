@@ -1,36 +1,61 @@
-import { useEffect } from "react";
-import { useUserStore } from "~/store/userStore";
+import { useEffect, useEffectEvent } from "react";
 import { isAxiosError } from "axios";
+import { useUserStore } from "~/store/userStore";
 import { api } from "~/lib/axios";
+import type { User } from "../../types/user.t";
+
+type Result = {
+  user: User;
+};
+
+const refreshAccessToken = async () => {
+  const response = await api.post("/api/v1/user/refresh-token");
+  console.log("refresh token", response);
+  return response.data;
+};
+
+const getCurrentUser = async () => {
+  const response = await api.get<Result>("/api/v1/user/current-user");
+  console.log("current user", response);
+  return response.data.data.user;
+};
+
+// User logged in -> auth store, store is lost after closing browser
+// User logged out -> clean auth store
+// user refreshed page -> persistan handles it
+
+// user unauthorized.
+// Refresh token
+// set user
+//  if not clean the store
 
 export function useAuthSync() {
-  const { setUser, setAuthChecked, logout } = useUserStore();
+  const { setUser, logout, setAuthChecked } = useUserStore();
 
-  useEffect(() => {
-    const syncAuth = async () => {
-      try {
-        const { data } = await api.get("/api/v1/user/current-user");
+  const authEvent = useEffectEvent(async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 401) {
+        try {
+          console.log(error.response.data);
+          await refreshAccessToken();
 
-        setUser(data.data.user);
-      } catch (error) {
-        if (isAxiosError(error) && error.response?.status === 401) {
-          try {
-            await api.post("/api/v1/user/refresh-token");
-
-            const { data } = await api.get("/api/v1/user/current-user");
-
-            setUser(data.data);
-          } catch {
-            logout();
-          }
-        } else {
+          const currentUser = await getCurrentUser();
+          setUser(currentUser);
+        } catch {
           logout();
         }
-      } finally {
-        setAuthChecked(true);
+      } else {
+        logout();
       }
-    };
+    } finally {
+      setAuthChecked(true);
+    }
+  });
 
-    syncAuth();
-  }, [setUser, setAuthChecked, logout]);
+  useEffect(() => {
+    authEvent();
+  }, []);
 }

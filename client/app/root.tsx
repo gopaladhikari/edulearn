@@ -13,6 +13,10 @@ import { GlobalError } from "./routes/error-boundary";
 import { useAuthSync } from "./hooks/sync-auth";
 import { Loading } from "./components/loading";
 
+export function HydrateFallback() {
+  return <Loading />;
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const navigation = useNavigation();
 
@@ -27,7 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <Header />
 
         <main>{isLoading ? <Loading /> : children}</main>

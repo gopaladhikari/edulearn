@@ -8,6 +8,7 @@ import {
   useNavigation,
   useActionData,
   redirect,
+  Form,
 } from "react-router";
 import { Button } from "~/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,18 +20,7 @@ import type { ApiError, ApiSuccess } from "../../../types/axios.t";
 import { useUserStore } from "~/store/userStore";
 import { handleActionError } from "~/lib/utils";
 import type { User } from "../../../types/user.t";
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
-  FieldTitle,
-} from "~/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 
 export function meta() {
   return [
@@ -58,7 +48,7 @@ export const clientAction: ActionFunction = async ({ request }) => {
     if (result.data.success)
       useUserStore.getState().setUser(result.data.data.user);
 
-    return redirect(redirectTo || "/");
+    return redirect(redirectTo);
   } catch (error) {
     return handleActionError(error);
   }
@@ -96,65 +86,66 @@ export default function Login() {
           Sign in to your account to continue learning
         </p>
 
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <Form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Email Field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-foreground"
-            >
-              Email address
-            </label>
-            <Input
-              id="email"
-              type="email"
-              aria-invalid={errors.email ? "true" : "false"}
-              placeholder="you@example.com"
-              {...register("email")}
-            />
-          </div>
-
-          {errors.email?.message && (
-            <p className="mt-1 text-sm text-destructive" id="email-error">
-              {errors.email.message}
-            </p>
-          )}
-
-          {/* Password Field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-foreground"
-            >
-              Password
-            </label>
-            <div className="relative">
+          <FieldGroup className="space-y-6">
+            {/* Email Field */}
+            <Field>
+              <FieldLabel htmlFor="login-email">Email address</FieldLabel>
               <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                aria-invalid={errors.password ? "true" : "false"}
-                {...register("password")}
+                id="login-email"
+                placeholder="you@example.com"
+                type="email"
+                {...register("email")}
+                aria-invalid={!!errors.email}
               />
+              {errors.email && (
+                <p className="mt-2 text-sm text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
+            </Field>
 
-              <button
-                type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                onClick={() => setShowPassword(!showPassword)}
+            {/* Password Field */}
+            <Field>
+              <FieldLabel htmlFor="login-password">Password</FieldLabel>
+              <div className="relative">
+                <Input
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  {...register("password")}
+                  aria-invalid={!!errors.password}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="mt-2 text-sm text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
+            </Field>
+
+            {/* Forgot Password */}
+            <div className="flex items-center justify-between">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-primary hover:underline"
               >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
+                Forgot password?
+              </Link>
             </div>
-            {errors.password?.message && (
-              <p className="mt-1 text-sm text-destructive" id="password-error">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
+          </FieldGroup>
 
           {actionData?.success === false && (
             <p className="mt-1 text-sm text-destructive">
@@ -174,7 +165,7 @@ export default function Login() {
           >
             {isSubmitting ? "Signing in..." : "Sign in"}
           </Button>
-        </form>
+        </Form>
 
         {/* Divider */}
         <div className="relative my-6">

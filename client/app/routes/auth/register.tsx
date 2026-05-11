@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Check, Eye, EyeOff, X } from "lucide-react";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import {
+  Form,
   Link,
   useNavigation,
   useSubmit,
@@ -14,6 +15,8 @@ import { Input } from "~/components/ui/input";
 import { api } from "~/lib/axios";
 import { handleActionError } from "~/lib/utils";
 import { registerSchema, type RegisterSchema } from "~/schemas/user.schema";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
+import { Checkbox } from "~/components/ui/checkbox";
 
 export function meta() {
   return [
@@ -38,7 +41,8 @@ export const clientAction: ActionFunction = async ({ request }) => {
 };
 
 export default function Register() {
-  const [showPassword, setShowPassword] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigation = useNavigation();
 
@@ -48,15 +52,35 @@ export default function Register() {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
+    getFieldState,
+    getValues,
   } = useForm({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      terms: false,
+    },
   });
 
   const onSubmit: SubmitHandler<RegisterSchema> = (data) => {
     submit(data);
   };
 
-  const isLoading = navigation.state === "submitting";
+  const isSubmitting = navigation.state === "submitting";
+
+  const password = watch("password");
+
+  const passwordRequirements = {
+    minLength: password.length >= 8,
+    hasUppercase: /[A-Z]/.test(password),
+    hasLowercase: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+  };
 
   return (
     <section className="w-full max-w-md">
@@ -68,82 +92,216 @@ export default function Register() {
           Join thousands of students learning with Edulearn
         </p>
 
-        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-2">
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-foreground"
-            >
-              username
-            </label>
-            <Input
-              id="username"
-              aria-invalid={errors.username ? "true" : "false"}
-              type="text"
-              placeholder="edulearn"
-              className="w-full"
-              {...register("username")}
-            />
-          </div>
-
-          {/* Email Field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-foreground"
-            >
-              Email address
-            </label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="edulearn@example.com"
-              className="w-full"
-              aria-invalid={errors.email ? "true" : "false"}
-              {...register("email")}
-            />
-          </div>
-
-          {/* Password Field */}
-          <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-foreground"
-            >
-              Password
-            </label>
-            <div className="relative">
+        <Form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <FieldGroup className="space-y-6">
+            {/* Username Field */}
+            <Field>
+              <FieldLabel htmlFor="register-username">username</FieldLabel>
               <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter a strong password"
-                className="w-full pr-10"
-                aria-invalid={errors.password ? "true" : "false"}
-                {...register("password")}
+                id="register-username"
+                placeholder="edulearn"
+                {...register("username")}
+                aria-invalid={!!errors.username}
               />
-              <button
-                type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5" />
-                ) : (
-                  <Eye className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-          </div>
+              {errors.username && (
+                <p className="mt-2 text-sm text-destructive">
+                  {errors.username.message}
+                </p>
+              )}
+            </Field>
 
-          {/* Sign Up Button */}
-          <Button
-            type="submit"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={isLoading}
-          >
-            {isLoading ? "Creating account..." : "Create account"}
-          </Button>
-        </form>
+            {/* Email Field */}
+            <Field>
+              <FieldLabel htmlFor="register-email">Email address</FieldLabel>
+              <Input
+                id="register-email"
+                type="email"
+                placeholder="you@example.com"
+                {...register("email")}
+                aria-invalid={!!errors.email}
+              />
+              {errors.email && (
+                <p className="mt-2 text-sm text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
+            </Field>
+
+            {/* Password Field */}
+            <Field>
+              <FieldLabel htmlFor="register-password">Password</FieldLabel>
+              <div className="relative">
+                <Input
+                  id="register-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter a strong password"
+                  {...register("password")}
+                  aria-invalid={!!errors.password}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="mt-2 text-sm text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
+
+              {/* Password Requirements */}
+              <div className="mt-3 space-y-1 text-sm">
+                <div className="flex items-center gap-2">
+                  {passwordRequirements.minLength ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <X className="h-4 w-4 text-destructive" />
+                  )}
+                  <span
+                    className={
+                      passwordRequirements.minLength
+                        ? "text-green-600"
+                        : "text-muted-foreground"
+                    }
+                  >
+                    At least 8 characters
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {passwordRequirements.hasUppercase ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <X className="h-4 w-4 text-destructive" />
+                  )}
+                  <span
+                    className={
+                      passwordRequirements.hasUppercase
+                        ? "text-green-600"
+                        : "text-muted-foreground"
+                    }
+                  >
+                    One uppercase letter
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {passwordRequirements.hasLowercase ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <X className="h-4 w-4 text-destructive" />
+                  )}
+                  <span
+                    className={
+                      passwordRequirements.hasLowercase
+                        ? "text-green-600"
+                        : "text-muted-foreground"
+                    }
+                  >
+                    One lowercase letter
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  {passwordRequirements.hasNumber ? (
+                    <Check className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <X className="h-4 w-4 text-destructive" />
+                  )}
+                  <span
+                    className={
+                      passwordRequirements.hasNumber
+                        ? "text-green-600"
+                        : "text-muted-foreground"
+                    }
+                  >
+                    One number
+                  </span>
+                </div>
+              </div>
+            </Field>
+
+            {/* Confirm Password Field */}
+            <Field>
+              <FieldLabel htmlFor="register-confirmPassword">
+                Confirm password
+              </FieldLabel>
+              <div className="relative">
+                <Input
+                  id="register-confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Re-enter your password"
+                  {...register("confirmPassword")}
+                  aria-invalid={!!errors.confirmPassword}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="mt-2 text-sm text-destructive">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </Field>
+
+            {/* Terms & Conditions */}
+            <Field orientation="horizontal">
+              <Checkbox
+                id="terms"
+                {...register("terms")}
+                disabled={isSubmitting}
+                aria-invalid={getFieldState("terms")?.invalid}
+                onCheckedChange={(value) => {
+                  console.log(getValues("terms"));
+                  const str = String(value) === "true";
+                  setValue("terms", str);
+                }}
+              />
+
+              <FieldLabel htmlFor="terms" className="font-normal">
+                I agree to the{" "}
+                <Link
+                  to="/terms-and-conditions"
+                  className="text-primary hover:underline"
+                >
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                  to="/privacy-policy"
+                  className="text-primary hover:underline"
+                >
+                  Privacy Policy
+                </Link>
+              </FieldLabel>
+            </Field>
+            {errors.terms && (
+              <p className="text-sm text-destructive">{errors.terms.message}</p>
+            )}
+
+            {/* Sign Up Button */}
+            <Button
+              type="submit"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating account..." : "Create account"}
+            </Button>
+          </FieldGroup>
+        </Form>
 
         {/* Divider */}
         <div className="relative my-6">

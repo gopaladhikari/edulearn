@@ -3,6 +3,7 @@ import { Card } from "~/components/ui/card";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 
 export default function VerifyEmail() {
   const [status, setStatus] = useState<"verifying" | "success" | "error">(

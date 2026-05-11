@@ -7,7 +7,9 @@ import {
   useNavigation,
   type ActionFunction,
   useSubmit,
+  Form,
 } from "react-router";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
@@ -65,24 +67,34 @@ export default function ForgotPassword() {
               your password
             </p>
 
-            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-              {/* Email Field */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-foreground"
-                >
-                  Email address
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  aria-invalid={errors.email ? "true" : "false"}
-                  {...register("email")}
-                />
-              </div>
+            <Form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+              <FieldGroup className="space-y-6">
+                {/* Email Field */}
+                <Field>
+                  <FieldLabel htmlFor="forgot-email">Email address</FieldLabel>
+                  <Input
+                    id="forgot-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    {...register("email")}
+                    aria-invalid={!!errors.email}
+                  />
+                  {errors.email && (
+                    <p className="mt-2 text-sm text-destructive">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </Field>
 
+                {/* Reset Button */}
+                <Button
+                  type="submit"
+                  className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Sending..." : "Send reset link"}
+                </Button>
+              </FieldGroup>
               {/* Submit Button */}
               <Button
                 type="submit"
@@ -91,7 +103,7 @@ export default function ForgotPassword() {
               >
                 {isSubmitting ? "Sending..." : "Send reset link"}
               </Button>
-            </form>
+            </Form>
 
             {/* Back to Login */}
             <div className="mt-6">

@@ -10,7 +10,7 @@ export const cookiesOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
   maxAge: 1 * 24 * 60 * 60 * 1000,
-  sameSite: "none",
+  sameSite: "lax",
 };
 
 export enum UserRoles {
