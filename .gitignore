@@ -158,3 +158,4 @@ sketch
 .react-router/
 build
 .netlify
+client/public/_redirects
