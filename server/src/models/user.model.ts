@@ -103,9 +103,7 @@ userSchema.methods.generateAccessToken = function () {
   const payload = { _id: this._id };
 
   return jwt.sign(payload, accessTokenSecret, {
-    expiresIn: process.env.ACCESS_TOKEN_EXPIRY as NonNullable<
-      SignOptions["expiresIn"]
-    >,
+    expiresIn: accessTokenExpiry as NonNullable<SignOptions["expiresIn"]>,
   });
 };
 
