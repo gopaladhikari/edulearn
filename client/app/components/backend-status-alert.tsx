@@ -1,36 +1,42 @@
-import { useEffect, useRef, useState, useEffectEvent } from "react";
+import { useEffect } from "react";
 import { CheckCircle2, RefreshCcw, Server, WifiOff } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { api } from "~/lib/axios";
 import { cn } from "~/lib/utils";
-
-type BackendStatus = "idle" | "checking" | "ready" | "failed";
+import { useBackendStatusStore } from "~/store/backend-status-store";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function checkBackendHealth() {
-  await api.get("/health");
+  await api.get("/health", {
+    timeout: 7000,
+  });
 }
 
 export function BackendStatusAlert() {
-  const hasChecked = useRef(false);
+  const status = useBackendStatusStore((state) => state.status);
+  const hasChecked = useBackendStatusStore((state) => state.hasChecked);
+  const lastCheckedAt = useBackendStatusStore((state) => state.lastCheckedAt);
 
-  const [status, setStatus] = useState<BackendStatus>("idle");
-  const [attempt, setAttempt] = useState(0);
+  const setStatus = useBackendStatusStore((state) => state.setStatus);
+  const setHasChecked = useBackendStatusStore((state) => state.setHasChecked);
+  const setLastCheckedAt = useBackendStatusStore(
+    (state) => state.setLastCheckedAt
+  );
 
-  const checkBackend = useEffectEvent(async () => {
+  const checkBackend = async () => {
     setStatus("checking");
 
-    const delays = [6000, 8000, 10000];
+    const delays = [1000, 2000, 3000, 5000, 8000];
 
-    for (let i = 0; i < delays.length; i++) {
+    for (const delay of delays) {
       try {
-        setAttempt(i + 1);
-
         await checkBackendHealth();
 
         setStatus("ready");
+        setHasChecked(true);
+        setLastCheckedAt(Date.now());
 
         setTimeout(() => {
           setStatus("idle");
@@ -38,17 +44,22 @@ export function BackendStatusAlert() {
 
         return;
       } catch {
-        await sleep(delays[i]);
+        await sleep(delay);
       }
     }
 
     setStatus("failed");
-  });
+    setHasChecked(true);
+    setLastCheckedAt(Date.now());
+  };
 
   useEffect(() => {
-    if (hasChecked.current) return;
+    const fiveMinutes = 5 * 60 * 1000;
 
-    hasChecked.current = true;
+    const recentlyChecked =
+      lastCheckedAt && Date.now() - lastCheckedAt < fiveMinutes;
+
+    if (hasChecked && recentlyChecked) return;
 
     checkBackend();
   }, []);
@@ -59,7 +70,7 @@ export function BackendStatusAlert() {
     <div className="fixed right-4 bottom-4 z-50 w-[calc(100%-2rem)] max-w-sm">
       <Card
         className={cn(
-          "border-border bg-card/95 p-4 shadow-xl backdrop-blur transition-all",
+          "border-border bg-card/95 p-4 shadow-xl backdrop-blur",
           status === "failed" && "border-destructive/40",
           status === "ready" && "border-primary/40"
         )}
@@ -89,7 +100,7 @@ export function BackendStatusAlert() {
                   Waking up server
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Free backend is starting. Attempt {attempt}/5...
+                  The backend may take a few seconds to start.
                 </p>
               </>
             )}

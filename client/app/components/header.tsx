@@ -100,7 +100,10 @@ export function Header() {
 
   const redirectTo = location.pathname;
 
-  const { isAuthenticated, user, logout, isAuthChecked } = useUserStore();
+  const isAuthChecked = useUserStore((state) => state.isAuthChecked);
+  const isAuthenticated = useUserStore((state) => state.isAuthenticated);
+  const user = useUserStore((state) => state.user);
+  const logout = useUserStore((state) => state.logout);
 
   return (
     <header className="h-20 border-b border-border bg-card">
