@@ -85,8 +85,6 @@ const userSchema = new Schema<IUsers>(
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   }
 );
 
@@ -105,7 +103,9 @@ userSchema.methods.generateAccessToken = function () {
   const payload = { _id: this._id };
 
   return jwt.sign(payload, accessTokenSecret, {
-    expiresIn: accessTokenExpiry as NonNullable<SignOptions["expiresIn"]>,
+    expiresIn: process.env.ACCESS_TOKEN_EXPIRY as NonNullable<
+      SignOptions["expiresIn"]
+    >,
   });
 };
 
@@ -133,12 +133,5 @@ userSchema.methods.generateToken = function () {
     tokenExpiry,
   };
 };
-
-userSchema.virtual("profile", {
-  ref: "UserProfile",
-  localField: "_id",
-  foreignField: "user",
-  justOne: true,
-});
 
 export const User = model("User", userSchema);

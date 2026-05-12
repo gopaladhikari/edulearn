@@ -17,7 +17,7 @@ export const JwtStrategy = (passport: PassportStatic) => {
   passport.use(
     new Strategy(options, async function (jwt_payload: JwtPayload, done) {
       try {
-        const user = await User.findById(jwt_payload._id).populate("profile");
+        const user = await User.findById(jwt_payload._id);
 
         if (!user)
           return done(null, false, { message: "Invalid email or password." });

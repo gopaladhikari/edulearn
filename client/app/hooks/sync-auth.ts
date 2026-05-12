@@ -8,11 +8,6 @@ type Result = {
   user: User;
 };
 
-const refreshAccessToken = async () => {
-  const response = await api.post("/api/v1/user/refresh-token");
-  return response.data;
-};
-
 const getCurrentUser = async () => {
   const response = await api.get<Result>("/api/v1/user/current-user");
   return response.data.data.user;
@@ -27,19 +22,8 @@ export function useAuthSync() {
     try {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-    } catch (error) {
-      if (isAxiosError(error) && error.response?.status === 401) {
-        try {
-          await refreshAccessToken();
-
-          const currentUser = await getCurrentUser();
-          setUser(currentUser);
-        } catch {
-          logout();
-        }
-      } else {
-        logout();
-      }
+    } catch {
+      logout();
     } finally {
       setAuthChecked(true);
     }
