@@ -2,7 +2,7 @@ import type { CookieOptions } from "express";
 
 export const appName = "edulearn";
 
-export const clientUrl = "https://edulearn-gopuadks.netlify.app";
+export const clientUrl = "https://edulearn.gopuadks.dev";
 
 export const defaultAvatar = "./public/default-avatar.svg";
 
