@@ -12,6 +12,7 @@ import "./app.css";
 import { GlobalError } from "./routes/error-boundary";
 import { useAuthSync } from "./hooks/sync-auth";
 import { Loading } from "./components/loading";
+import { BackendStatusAlert } from "./components/backend-status-alert";
 
 export function HydrateFallback() {
   return <Loading />;
@@ -33,7 +34,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body suppressHydrationWarning>
         <Header />
-
         <main>{isLoading ? <Loading /> : children}</main>
         <Footer />
         <ScrollRestoration />
@@ -45,7 +45,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   useAuthSync();
-  return <Outlet />;
+  return (
+    <>
+      <BackendStatusAlert />
+      <Outlet />
+    </>
+  );
 }
 
 export function ErrorBoundary() {
