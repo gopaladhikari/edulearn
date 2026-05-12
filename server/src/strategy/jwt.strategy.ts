@@ -6,9 +6,7 @@ import type { Request } from "express";
 
 const options: StrategyOptions = {
   jwtFromRequest: function (req: Request) {
-    const token =
-      req.cookies?.accessToken ||
-      req.headers.authorization?.replace("Bearer ", "");
+    const token = req.cookies?.accessToken;
 
     return token || null;
   },

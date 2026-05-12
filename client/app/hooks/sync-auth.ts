@@ -30,7 +30,6 @@ export function useAuthSync() {
     } catch (error) {
       if (isAxiosError(error) && error.response?.status === 401) {
         try {
-          console.log("error", error.response.data);
           await refreshAccessToken();
 
           const currentUser = await getCurrentUser();

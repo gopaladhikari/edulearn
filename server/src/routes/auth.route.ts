@@ -60,7 +60,7 @@ authRouter
     resendEmailVerification
   );
 
-authRouter.route("/refresh-token").post(verifyJwt, refreshAccessToken);
+authRouter.route("/refresh-token").post(refreshAccessToken);
 
 authRouter
   .route("/forgot-password")
