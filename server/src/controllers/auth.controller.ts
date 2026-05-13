@@ -51,13 +51,13 @@ export const registerUser = async (req: Request, res: Response) => {
 
   const content = emailVerificationTemplate(
     user.username,
-    `${clientUrl}/verify-email?token=${unhashedToken}`
+    `${clientUrl}/verify-email/${unhashedToken}`
   );
 
   res.status(201).json(
     new ApiResponse(201, "Registration successful! 🎉", {
       message:
-        "We've sent a verification email to your inbox. Please verify your email address to complete registration.",
+        "We've sent a verification email to your inbox. Please verify your email address to complete registration. Your verification link will expire in 20 minutes.",
       email: user.email,
       expiresIn: "20 minutes",
     })

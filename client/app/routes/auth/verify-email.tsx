@@ -1,20 +1,117 @@
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import {
+  data,
+  Form,
+  Link,
+  useFetcher,
+  useLoaderData,
+  type ActionFunction,
+  type LoaderFunction,
+} from "react-router";
+import { api } from "~/lib/axios";
+import { cn, handleActionError } from "~/lib/utils";
+import type { ApiError, ApiSuccess } from "../../../types/axios.t";
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
+import { Field, FieldGroup } from "~/components/ui/field";
+import { Label } from "~/components/ui/label";
+import { Input } from "~/components/ui/input";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  resendEmailVerificationSchema,
+  type ResendEmailVerificationSchema,
+} from "~/schemas/user.schema";
 
 export function meta() {
-  return [
-    { title: "Verify Email - Edulearn" },
-    { name: "description", content: "Verify email" },
-  ];
+  return [{ title: "Verify Email - Edulearn" }];
 }
 
+export const clientLoader: LoaderFunction = async ({ params }) => {
+  const token = params?.token;
+
+  if (!token)
+    return data(
+      {
+        success: false,
+        message: "Invalid token",
+      },
+      {
+        status: 400,
+      }
+    );
+
+  try {
+    const result = await api.post(`/api/v1/user/verify-email/${token}`);
+
+    return data(result.data, {
+      status: result.status,
+    });
+  } catch (error) {
+    return handleActionError(error);
+  }
+};
+
+export const clientAction: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+
+  try {
+    const result = await api.post(
+      `/api/v1/user/resend-email-verification`,
+      Object.fromEntries(formData)
+    );
+
+    return data(result.data, {
+      status: result.status,
+    });
+  } catch (error) {
+    return handleActionError(error);
+  }
+};
+
 export default function VerifyEmail() {
-  const [status, setStatus] = useState<"verifying" | "success" | "error">(
-    "verifying"
-  );
+  const [showModal, setShowModal] = useState(false);
+
+  const fetcher = useFetcher<ApiSuccess | ApiError>();
+
+  const loaderData = useLoaderData<ApiSuccess | ApiError>();
+
+  const isSubmitting = fetcher.state === "submitting";
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(resendEmailVerificationSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const onSubmit: SubmitHandler<ResendEmailVerificationSchema> = (values) => {
+    fetcher.submit(values, {
+      method: "POST",
+    });
+  };
+
+  const status = loaderData?.success
+    ? "success"
+    : loaderData?.message
+      ? "error"
+      : "verifying";
 
   return (
     <div className="w-full max-w-md">
@@ -83,26 +180,76 @@ export default function VerifyEmail() {
               Verification failed
             </h1>
             <p className="mb-8 text-center text-muted-foreground">
-              The verification link has expired or is invalid. Please request a
-              new verification email.
+              {loaderData?.message ||
+                "The verification link has expired or is invalid. Please request a new verification email."}
             </p>
 
             {/* Retry Button */}
-            <Button
-              onClick={() => setStatus("verifying")}
-              className="mb-3 w-full bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              Try again
-            </Button>
+
+            <Dialog open={showModal} onOpenChange={setShowModal}>
+              <Form method="post">
+                <DialogTrigger asChild>
+                  <Button className="mb-3 w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                    Try again
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-sm">
+                  <DialogHeader>
+                    <DialogTitle>Resend verification email.</DialogTitle>
+                    <DialogDescription>
+                      Enter your email address to receive a new verification
+                      email.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <FieldGroup>
+                    <Field>
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        placeholder="Your email"
+                        {...register("email")}
+                        aria-invalid={!!errors.email}
+                      />
+                      {errors.email && (
+                        <p className="mt-2 text-sm text-destructive">
+                          {errors.email.message}
+                        </p>
+                      )}
+                      {fetcher.data?.success ? (
+                        <p className="text-green-700">{fetcher.data.message}</p>
+                      ) : (
+                        <p className="text-sm text-destructive">
+                          {fetcher.data?.message}
+                        </p>
+                      )}
+                    </Field>
+                  </FieldGroup>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      {isSubmitting ? "Sending..." : "Try again"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Form>
+            </Dialog>
 
             {/* Back to Login */}
-            <Link to="/login" className="block">
-              <Button
-                variant="outline"
-                className="w-full border-primary text-primary hover:bg-primary/5"
-              >
-                Back to login
-              </Button>
+            <Link
+              to="/login"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "w-full border-primary text-primary hover:bg-primary/5"
+              )}
+            >
+              Back to login
             </Link>
           </>
         )}

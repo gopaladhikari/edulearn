@@ -20,7 +20,7 @@
 
 ## 🛠 Tech Stack
 
-- Frontend: React
+- Frontend: React Router 7
 - Backend: Node.js, Express
 - Database: MongoDB
 - Authentication: JWT
