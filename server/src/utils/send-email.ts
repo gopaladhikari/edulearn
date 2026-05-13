@@ -21,7 +21,7 @@ export const sendEmail = async (
     const html = mailGenerator.generate(body);
 
     const { data, error } = await resend.emails.send({
-      from: "Edulearn <edulearn@gopal-adhikari.com.np>",
+      from: "Edulearn <edulearn@gopuadks.dev>",
       to: [email],
       subject,
       html,
