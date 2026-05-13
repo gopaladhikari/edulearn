@@ -1,8 +1,4 @@
-import axios, {
-  AxiosError,
-  type AxiosRequestConfig,
-  type InternalAxiosRequestConfig,
-} from "axios";
+import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { useUserStore } from "~/store/userStore";
 
 const baseURL = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL;

@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, Eye, EyeOff, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import {
   Form,
   Link,
+  useActionData,
   useNavigation,
   useSubmit,
   type ActionFunction,
@@ -18,6 +19,7 @@ import { registerSchema, type RegisterSchema } from "~/schemas/user.schema";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Checkbox } from "~/components/ui/checkbox";
 import { getPasswordRequirements } from "~/lib/utils";
+import type { ApiError, ApiSuccess } from "../../../types/axios.t";
 
 export function meta() {
   return [
@@ -45,6 +47,8 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const actionData = useActionData<ApiSuccess | ApiError>();
+
   const navigation = useNavigation();
 
   const submit = useSubmit();
@@ -56,7 +60,7 @@ export default function Register() {
     watch,
     setValue,
     getFieldState,
-    getValues,
+    reset,
   } = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -68,8 +72,8 @@ export default function Register() {
     },
   });
 
-  const onSubmit: SubmitHandler<RegisterSchema> = (data) => {
-    submit(data);
+  const onSubmit: SubmitHandler<RegisterSchema> = async (data) => {
+    submit(data, { method: "POST" });
   };
 
   const isSubmitting = navigation.state === "submitting";
@@ -77,6 +81,14 @@ export default function Register() {
   const password = watch("password");
 
   const passwordRequirements = getPasswordRequirements(password);
+
+  useEffect(() => {
+    if (actionData?.success) reset();
+
+    return () => {
+      reset();
+    };
+  }, [actionData?.success]);
 
   return (
     <section className="w-full max-w-md">
@@ -261,7 +273,6 @@ export default function Register() {
                 disabled={isSubmitting}
                 aria-invalid={getFieldState("terms")?.invalid}
                 onCheckedChange={(value) => {
-                  console.log(getValues("terms"));
                   const str = String(value) === "true";
                   setValue("terms", str);
                 }}
@@ -286,6 +297,15 @@ export default function Register() {
             </Field>
             {errors.terms && (
               <p className="text-sm text-destructive">{errors.terms.message}</p>
+            )}
+
+            {actionData?.success ? (
+              <div className="rounded-xl bg-green-500/10 p-4 text-green-900">
+                <p className="font-bold">{actionData.message}</p>
+                <p className="text-sm">{actionData.data?.message}</p>
+              </div>
+            ) : (
+              <p className="text-sm text-destructive">{actionData?.message}</p>
             )}
 
             {/* Sign Up Button */}
