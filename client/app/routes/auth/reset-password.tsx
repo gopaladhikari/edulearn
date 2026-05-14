@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Eye, EyeOff, X } from "lucide-react";
+import { Check, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import {
@@ -8,6 +8,7 @@ import {
   type ActionFunction,
   Link,
   useSubmit,
+  Form,
 } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -17,7 +18,10 @@ import {
   type ResetPasswordSchema,
 } from "~/schemas/user.schema";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
-import { getPasswordRequirements } from "~/lib/utils";
+import type { ApiError, ApiSuccess } from "../../../types/axios.t";
+import { PasswordRequirement } from "./components/password-requirement";
+import { handleActionError } from "~/lib/utils";
+import { api } from "~/lib/axios";
 
 export function meta() {
   return [
@@ -26,12 +30,23 @@ export function meta() {
   ];
 }
 
-export const clientAction: ActionFunction = async ({ request }) => {
+export const clientAction: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData();
 
-  console.log(formData);
+  const token = params?.token;
 
-  return true;
+  if (!token) throw new Error("Token not found");
+
+  try {
+    const response = await api.post(
+      `/api/v1/user/reset-password/${token}`,
+      Object.fromEntries(formData)
+    );
+
+    return response.data;
+  } catch (error) {
+    return handleActionError(error);
+  }
 };
 
 export default function ResetPassword() {
@@ -45,7 +60,7 @@ export default function ResetPassword() {
 
   const submit = useSubmit();
 
-  const isSubmitSuccessful = useActionData<boolean>();
+  const actionData = useActionData<ApiError | ApiSuccess>();
 
   const {
     register,
@@ -57,17 +72,15 @@ export default function ResetPassword() {
   });
 
   const onSubmit: SubmitHandler<ResetPasswordSchema> = (data) => {
-    submit(data);
+    submit(data, { method: "post" });
   };
 
   const password = watch("newPassword");
 
-  const passwordRequirements = getPasswordRequirements(password);
-
   return (
     <div className="w-full max-w-md">
       <Card className="p-8">
-        {!isSubmitSuccessful ? (
+        {!actionData?.success ? (
           <>
             <h1 className="mb-2 text-3xl font-bold text-foreground">
               Reset password
@@ -76,9 +89,9 @@ export default function ResetPassword() {
               Enter your new password below
             </p>
 
-            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+            <Form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               {/* Password Field */}
-              <FieldGroup className="space-y-6">
+              <FieldGroup>
                 {/* Password Field */}
                 <Field>
                   <FieldLabel htmlFor="reset-password">New password</FieldLabel>
@@ -108,73 +121,7 @@ export default function ResetPassword() {
                     </p>
                   )}
 
-                  {/* Password Requirements */}
-                  <div className="mt-3 space-y-1 text-sm">
-                    <div className="flex items-center gap-2">
-                      {passwordRequirements.minLength ? (
-                        <Check className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <X className="h-4 w-4 text-destructive" />
-                      )}
-                      <span
-                        className={
-                          passwordRequirements.minLength
-                            ? "text-green-600"
-                            : "text-muted-foreground"
-                        }
-                      >
-                        At least 8 characters
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {passwordRequirements.hasUppercase ? (
-                        <Check className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <X className="h-4 w-4 text-destructive" />
-                      )}
-                      <span
-                        className={
-                          passwordRequirements.hasUppercase
-                            ? "text-green-600"
-                            : "text-muted-foreground"
-                        }
-                      >
-                        One uppercase letter
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {passwordRequirements.hasLowercase ? (
-                        <Check className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <X className="h-4 w-4 text-destructive" />
-                      )}
-                      <span
-                        className={
-                          passwordRequirements.hasLowercase
-                            ? "text-green-600"
-                            : "text-muted-foreground"
-                        }
-                      >
-                        One lowercase letter
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {passwordRequirements.hasNumber ? (
-                        <Check className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <X className="h-4 w-4 text-destructive" />
-                      )}
-                      <span
-                        className={
-                          passwordRequirements.hasNumber
-                            ? "text-green-600"
-                            : "text-muted-foreground"
-                        }
-                      >
-                        One number
-                      </span>
-                    </div>
-                  </div>
+                  <PasswordRequirement password={password} />
                 </Field>
 
                 {/* Confirm Password Field */}
@@ -220,7 +167,7 @@ export default function ResetPassword() {
                   {isLoading ? "Resetting..." : "Reset password"}
                 </Button>
               </FieldGroup>
-            </form>
+            </Form>
           </>
         ) : (
           <>

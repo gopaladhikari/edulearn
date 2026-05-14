@@ -17,6 +17,9 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordSchema,
 } from "~/schemas/user.schema";
+import { api } from "~/lib/axios";
+import { handleActionError } from "~/lib/utils";
+import type { ApiError, ApiSuccess } from "../../../types/axios.t";
 
 export function meta() {
   return [
@@ -26,11 +29,18 @@ export function meta() {
 }
 
 export const clientAction: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
+  try {
+    const formData = await request.formData();
 
-  console.log(formData);
+    const response = await api.post(
+      "/api/v1/user/forgot-password",
+      Object.fromEntries(formData)
+    );
 
-  return true;
+    return response.data;
+  } catch (error) {
+    return handleActionError(error);
+  }
 };
 
 export default function ForgotPassword() {
@@ -46,18 +56,20 @@ export default function ForgotPassword() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const isSubmitted = useActionData<boolean>();
+  const actionData = useActionData<ApiError | ApiSuccess>();
+
+  console.log({ actionData });
 
   const isSubmitting = navigator.state === "submitting";
 
-  const onSubmit: SubmitHandler<ForgotPasswordSchema> = async (data) => {
+  const onSubmit: SubmitHandler<ForgotPasswordSchema> = (data) => {
     submit(data, { method: "post" });
   };
 
   return (
     <div className="w-full max-w-md">
       <Card className="p-8">
-        {!isSubmitted ? (
+        {!actionData?.success ? (
           <>
             <h1 className="mb-2 text-3xl font-bold text-foreground">
               Forgot password?
@@ -68,7 +80,7 @@ export default function ForgotPassword() {
             </p>
 
             <Form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-              <FieldGroup className="space-y-6">
+              <FieldGroup>
                 {/* Email Field */}
                 <Field>
                   <FieldLabel htmlFor="forgot-email">Email address</FieldLabel>
@@ -85,8 +97,6 @@ export default function ForgotPassword() {
                     </p>
                   )}
                 </Field>
-
-                {/* Reset Button */}
                 <Button
                   type="submit"
                   className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
@@ -96,13 +106,6 @@ export default function ForgotPassword() {
                 </Button>
               </FieldGroup>
               {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Sending..." : "Send reset link"}
-              </Button>
             </Form>
 
             {/* Back to Login */}
@@ -129,12 +132,12 @@ export default function ForgotPassword() {
             </h1>
             <p className="mb-8 text-center text-muted-foreground">
               We&apos;ve sent a password reset link to{" "}
-              <span className="font-semibold text-foreground">email</span>
+              <span className="font-semibold text-foreground">your email.</span>
             </p>
 
             <p className="mb-8 text-center text-sm text-muted-foreground">
               Follow the link in the email to reset your password. The link will
-              expire in 1 hour.
+              expire in 20 minutes.
             </p>
 
             {/* Back to Login */}

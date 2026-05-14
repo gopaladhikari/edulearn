@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Eye, EyeOff, X } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import {
@@ -18,8 +18,8 @@ import { handleActionError } from "~/lib/utils";
 import { registerSchema, type RegisterSchema } from "~/schemas/user.schema";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Checkbox } from "~/components/ui/checkbox";
-import { getPasswordRequirements } from "~/lib/utils";
 import type { ApiError, ApiSuccess } from "../../../types/axios.t";
+import { PasswordRequirement } from "./components/password-requirement";
 
 export function meta() {
   return [
@@ -80,8 +80,6 @@ export default function Register() {
 
   const password = watch("password");
 
-  const passwordRequirements = getPasswordRequirements(password);
-
   useEffect(() => {
     if (actionData?.success) reset();
 
@@ -101,7 +99,7 @@ export default function Register() {
         </p>
 
         <Form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-          <FieldGroup className="space-y-6">
+          <FieldGroup>
             {/* Username Field */}
             <Field>
               <FieldLabel htmlFor="register-username">username</FieldLabel>
@@ -165,72 +163,7 @@ export default function Register() {
               )}
 
               {/* Password Requirements */}
-              <div className="mt-3 space-y-1 text-sm">
-                <div className="flex items-center gap-2">
-                  {passwordRequirements.minLength ? (
-                    <Check className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <X className="h-4 w-4 text-destructive" />
-                  )}
-                  <span
-                    className={
-                      passwordRequirements.minLength
-                        ? "text-green-600"
-                        : "text-muted-foreground"
-                    }
-                  >
-                    At least 8 characters
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {passwordRequirements.hasUppercase ? (
-                    <Check className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <X className="h-4 w-4 text-destructive" />
-                  )}
-                  <span
-                    className={
-                      passwordRequirements.hasUppercase
-                        ? "text-green-600"
-                        : "text-muted-foreground"
-                    }
-                  >
-                    One uppercase letter
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {passwordRequirements.hasLowercase ? (
-                    <Check className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <X className="h-4 w-4 text-destructive" />
-                  )}
-                  <span
-                    className={
-                      passwordRequirements.hasLowercase
-                        ? "text-green-600"
-                        : "text-muted-foreground"
-                    }
-                  >
-                    One lowercase letter
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {passwordRequirements.hasNumber ? (
-                    <Check className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <X className="h-4 w-4 text-destructive" />
-                  )}
-                  <span
-                    className={
-                      passwordRequirements.hasNumber
-                        ? "text-green-600"
-                        : "text-muted-foreground"
-                    }
-                  >
-                    One number
-                  </span>
-                </div>
-              </div>
+              <PasswordRequirement password={password} />
             </Field>
 
             {/* Confirm Password Field */}

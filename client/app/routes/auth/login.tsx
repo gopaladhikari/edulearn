@@ -88,7 +88,7 @@ export default function Login() {
 
         <Form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Email Field */}
-          <FieldGroup className="space-y-6">
+          <FieldGroup>
             {/* Email Field */}
             <Field>
               <FieldLabel htmlFor="login-email">Email address</FieldLabel>

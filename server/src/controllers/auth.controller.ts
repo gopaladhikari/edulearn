@@ -225,7 +225,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
   const content = forgotPasswordTemplate(
     user.username,
-    `${clientUrl}/reset-password?token=${unhashedToken}`
+    `${clientUrl}/reset-password/${unhashedToken}`
   );
 
   sendEmail(user.email, "Reset your password", content).then((result) => {

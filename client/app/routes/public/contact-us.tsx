@@ -153,7 +153,7 @@ function ContactForm() {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <FieldGroup className="space-y-6">
+      <FieldGroup>
         {/* Name Fields */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field>
