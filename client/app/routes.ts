@@ -17,6 +17,7 @@ export default [
   ]),
 
   layout("routes/user/layout.tsx", [
+    route("/logout", "routes/user/logout.tsx"),
     route("/profile", "routes/user/profile.tsx"),
     route("/wishlist", "routes/user/wishlist.tsx"),
     route("/cart", "routes/user/cart.tsx"),

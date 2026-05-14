@@ -2,30 +2,27 @@ import { Link, useLocation } from "react-router";
 import { Button, buttonVariants } from "./ui/button";
 import { cn } from "~/lib/utils";
 import { useUserStore } from "~/store/userStore";
-import {
-  BadgeCheckIcon,
-  Bell,
-  BellIcon,
-  CreditCardIcon,
-  Heart,
-  LogOutIcon,
-  ShoppingCart,
-} from "lucide-react";
+import { Bell, Heart, LogOutIcon, ShoppingCart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { useFetcher } from "react-router";
 
 import type { User } from "../../types/user.t";
 import { Skeleton } from "./ui/skeleton";
 import { Logo } from "./logo";
+import type { ApiError, ApiSuccess } from "../../types/axios.t";
 
-function UserNav({ user, logout }: { user: User; logout: () => void }) {
+function UserNav({ user }: { user: User }) {
+  const logoutFetcher = useFetcher<ApiSuccess | ApiError>();
+
   return (
     <div className="flex gap-8">
       <menu className="flex items-center gap-8">
@@ -48,30 +45,73 @@ function UserNav({ user, logout }: { user: User; logout: () => void }) {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="rounded-full">
             <Avatar>
-              <AvatarImage src="/default-avatar.svg" alt="shadcn" />
+              <AvatarImage
+                src="/default-avatar.svg"
+                alt={`${user.username}'s avatar`}
+              />
               <AvatarFallback>{user.username[0].toUpperCase()} </AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-50">
           <DropdownMenuGroup>
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuItem>
-              <BadgeCheckIcon />
-              Account
+              <Link to="/profile" className="w-full">
+                Profile
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <CreditCardIcon />
-              Billing
+              <Link to="/cart" className="w-full">
+                My Cart
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <BellIcon />
-              Notifications
+              <Link to="/wishlist" className="w-full">
+                My Wishlist
+              </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
+
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={logout}>
-            <LogOutIcon />
-            Sign Out
+
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>Settings</DropdownMenuLabel>
+            <DropdownMenuItem>
+              <Link to="/settings" className="w-full">
+                Account Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to="/payment-settings" className="w-full">
+                Payment Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to="/subscription" className="w-full">
+                Subscription
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link to="/purchase-history" className="w-full">
+                Purchase History
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem>
+            <logoutFetcher.Form
+              method="POST"
+              action="/logout"
+              className="w-full"
+            >
+              <Button type="submit" className="w-full" variant="destructive">
+                Logout
+                <LogOutIcon />
+              </Button>
+            </logoutFetcher.Form>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -103,7 +143,6 @@ export function Header() {
   const isAuthChecked = useUserStore((state) => state.isAuthChecked);
   const isAuthenticated = useUserStore((state) => state.isAuthenticated);
   const user = useUserStore((state) => state.user);
-  const logout = useUserStore((state) => state.logout);
 
   return (
     <header className="h-20 border-b border-border bg-card">
@@ -118,7 +157,7 @@ export function Header() {
         ) : (
           <>
             {isAuthenticated ? (
-              <UserNav user={user!} logout={logout} />
+              <UserNav user={user!} />
             ) : (
               <AuthNav redirectTo={redirectTo} />
             )}
