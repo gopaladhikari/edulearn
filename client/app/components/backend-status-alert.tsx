@@ -28,7 +28,7 @@ export function BackendStatusAlert() {
   const checkBackend = async () => {
     setStatus("checking");
 
-    const delays = [1000, 2000, 3000, 5000, 8000];
+    const delays = [20000, 15000, 10000, 5000, 4000, 3000, 2000, 1000]; // 1 min
 
     for (const delay of delays) {
       try {
