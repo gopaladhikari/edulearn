@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img"
+  aria-label="Banner image unavailable">
+  <defs>
+    <linearGradient id="bgGradBanner" x1="0" x2="1">
+      <stop offset="0%" stop-color="#eef2ff" />
+      <stop offset="50%" stop-color="#e7f0ff" />
+      <stop offset="100%" stop-color="#eef2ff" />
+    </linearGradient>
+
+    <linearGradient id="shineBanner" x1="0" x2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+      <animate attributeName="x1" values="-1;2" dur="3s" repeatCount="indefinite" />
+    </linearGradient>
+
+    <clipPath id="roundClipBanner">
+      <rect x="0" y="0" width="1200" height="420" rx="14" ry="14" />
+    </clipPath>
+  </defs>
+
+  <rect width="1200" height="420" rx="14" ry="14" fill="url(#bgGradBanner)" />
+
+  <rect x="-1200" y="0" width="3600" height="420" fill="url(#shineBanner)" clip-path="url(#roundClipBanner)" />
+
+  <g transform="translate(140,120)" stroke-linecap="round" stroke-linejoin="round" stroke="#9fb0e6" stroke-width="4"
+    fill="none">
+    <path d="M0 140 C90 70, 180 70, 260 140 C360 230, 480 180, 580 130 C700 70, 820 130, 980 155" />
+    <circle cx="1040" cy="28" r="28" stroke="#cfe3ff" fill="#f8fbff" />
+  </g>
+
+  <g transform="translate(600,210) scale(1)" text-anchor="middle">
+    <rect x="-220" y="-110" width="440" height="220" rx="14" ry="14" fill="none" stroke="#bfcff5" stroke-width="3">
+    </rect>
+    <path d="M-160 10 L-80 -70 L0 20 L80 -40 L160 40" stroke="#b0c4ee" stroke-width="5" fill="none"
+      stroke-linejoin="round" />
+    <circle cx="190" cy="-90" r="22" stroke="#d2e6ff" fill="#f7fbff" stroke-width="3" />
+  </g>
+
+  <g transform="translate(40,330)">
+    <rect width="560" height="20" rx="8" fill="#cfe4ff"></rect>
+    <rect y="30" width="360" height="14" rx="7" fill="#e6f0ff"></rect>
+  </g>
+
+  <text x="44" y="410" font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial"
+    font-size="12" fill="#8093c6">Banner unavailable</text>
+</svg>

@@ -63,7 +63,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  to="/"
+                  to="/about"
                   className="text-card/70 transition-colors hover:text-card"
                 >
                   About
@@ -71,7 +71,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  to="/"
+                  to="/blogs"
                   className="text-card/70 transition-colors hover:text-card"
                 >
                   Blog
@@ -102,7 +102,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  to="/"
+                  to="/cookies"
                   className="text-card/70 transition-colors hover:text-card"
                 >
                   Cookies
