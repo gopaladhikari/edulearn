@@ -10,7 +10,7 @@ import {
   redirect,
   Form,
 } from "react-router";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { loginSchema, type LoginSchema } from "~/schemas/user.schema";
@@ -18,7 +18,7 @@ import { useState } from "react";
 import { api } from "~/lib/axios";
 import type { ApiError, ApiSuccess } from "../../../types/axios.t";
 import { useUserStore } from "~/store/userStore";
-import { handleActionError } from "~/lib/utils";
+import { cn, handleActionError } from "~/lib/utils";
 import type { User } from "../../../types/user.t";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 
@@ -160,10 +160,30 @@ export default function Login() {
           {/* Sign In Button */}
           <Button
             type="submit"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "w-full text-black"
+            )}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Signing in..." : "Sign in"}
+            Sign in
+          </Button>
+
+          <Button
+            type="button"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "w-full text-black"
+            )}
+            disabled={isSubmitting}
+            onClick={() => {
+              onSubmit({
+                email: "student@edulearn.com",
+                password: "Student123",
+              });
+            }}
+          >
+            Login as a student
           </Button>
         </Form>
 
@@ -180,14 +200,8 @@ export default function Login() {
         </div>
 
         {/* Sign Up Link */}
-        <Link to="/register" className="block w-full">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full border-primary text-primary hover:bg-primary/5"
-          >
-            Create account
-          </Button>
+        <Link to="/register" className={cn(buttonVariants(), "w-full")}>
+          Create account
         </Link>
       </Card>
 

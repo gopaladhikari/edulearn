@@ -8,16 +8,15 @@ export const LocalStrategy = (passport: PassportStatic) => {
       try {
         const user = await User.findOne({ email }).select("+password");
 
-        if (!user)
-          return done(null, false, { message: "Invalid email or password." });
+        if (!user) return done(new Error("Invalid email or password."), false);
 
         if (!user.isEmailVerified)
-          return done(null, false, { message: "Email not verified." });
+          return done(new Error("Email is not verified."), false);
 
         const isPasswordValid = await user.isPasswordValid(password);
 
         if (!isPasswordValid)
-          return done(null, false, { message: "Invalid email or password." });
+          return done(new Error("Invalid email or password."), false);
 
         return done(null, user);
       } catch (error) {

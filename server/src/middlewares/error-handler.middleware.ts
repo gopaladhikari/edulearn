@@ -17,7 +17,13 @@ export const errorHandler = (
     message = err.message;
     isOperational = err.isOperational;
     errors = err.errors;
-  } else if (err instanceof Error) message = err.message;
+  } else if ("status" in err && typeof err.status === "number") {
+    status = err.status;
+    message = err.message;
+    isOperational = true;
+  } else if (err instanceof Error) {
+    message = err.message;
+  }
 
   if (process.env.NODE_ENV === "development") {
     return res.status(status).json({
