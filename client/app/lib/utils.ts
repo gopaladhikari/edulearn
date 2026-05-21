@@ -3,13 +3,13 @@ import { clsx, type ClassValue } from "clsx";
 import { data } from "react-router";
 import { twMerge } from "tailwind-merge";
 import { api } from "./axios";
-import type { ApiError } from "../../types/axios.t";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
 export function handleActionError(error: unknown) {
+  console.log(error);
   if (isAxiosError(error)) {
     console.log(error.response?.data);
     return data(error.response?.data, {

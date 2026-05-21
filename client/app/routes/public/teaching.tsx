@@ -12,8 +12,9 @@ import {
   BarChart3,
 } from "lucide-react";
 import { Link } from "react-router";
-import { Button } from "~/components/ui/button";
+import { Button, buttonVariants } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
+import { cn } from "~/lib/utils";
 
 export function meta() {
   return [
@@ -38,10 +39,14 @@ export default function TeachingPage() {
                 the world and earn money doing what you love.
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Link to="/register">
-                  <Button className="h-12 bg-primary px-8 text-lg text-primary-foreground hover:bg-primary/90">
-                    Start teaching
-                  </Button>
+                <Link
+                  to="/become-instructor"
+                  className={cn(
+                    buttonVariants(),
+                    "h-12 bg-primary px-8 text-lg text-primary-foreground hover:bg-primary/90"
+                  )}
+                >
+                  Start teaching
                 </Link>
                 <Button variant="outline" className="h-12 px-8 text-lg">
                   Learn more

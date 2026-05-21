@@ -1,6 +1,10 @@
+import { useUserStore } from "~/store/userStore";
+
 export function meta() {
+  const user = useUserStore().user;
+
   return [
-    { title: "Profile - Edulearn" },
+    { title: `${user?.username ?? "Profile"} - Edulearn` },
     { name: "description", content: "Profile page" },
   ];
 }

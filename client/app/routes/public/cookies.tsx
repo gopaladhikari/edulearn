@@ -2,6 +2,19 @@ import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 
+export function meta() {
+  return [
+    {
+      title: "Cookie Policy - Edulearn",
+    },
+    {
+      name: "description",
+      content:
+        "Learn how to build a cookie policy page with Next.js and Tailwind CSS.",
+    },
+  ];
+}
+
 export default function CookiesPage() {
   return (
     <>

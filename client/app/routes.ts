@@ -22,6 +22,7 @@ export default [
     route("/wishlist", "routes/user/wishlist.tsx"),
     route("/cart", "routes/user/cart.tsx"),
     route("/notifications", "routes/user/notification.tsx"),
+    route("/become-instructor", "routes/user/become-instructor.tsx"),
   ]),
 
   // Public routes

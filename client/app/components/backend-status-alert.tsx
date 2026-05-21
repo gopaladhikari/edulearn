@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, RefreshCcw, Server, WifiOff } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -8,9 +8,23 @@ import { useBackendStatusStore } from "~/store/backend-status-store";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function checkBackendHealth() {
+type WakeupAttempt = {
+  timeoutMs: number;
+  delayMs: number;
+};
+
+const wakeupAttempts: WakeupAttempt[] = [
+  { timeoutMs: 20000, delayMs: 1000 },
+  { timeoutMs: 15000, delayMs: 1500 },
+  { timeoutMs: 12000, delayMs: 2000 },
+  { timeoutMs: 10000, delayMs: 2500 },
+  { timeoutMs: 10000, delayMs: 3000 },
+  { timeoutMs: 8000, delayMs: 4000 },
+];
+
+async function checkBackendHealth(timeoutMs: number) {
   await api.get("/health", {
-    timeout: 7000,
+    timeout: timeoutMs,
   });
 }
 
@@ -25,39 +39,49 @@ export function BackendStatusAlert() {
     (state) => state.setLastCheckedAt
   );
 
+  const [attempt, setAttempt] = useState(0);
+
   const checkBackend = async () => {
     setStatus("checking");
+    setAttempt(0);
 
-    const delays = [20000, 15000, 10000, 5000, 4000, 3000, 2000, 1000]; // 1 min
+    for (let index = 0; index < wakeupAttempts.length; index++) {
+      const { timeoutMs, delayMs } = wakeupAttempts[index];
 
-    for (const delay of delays) {
       try {
-        await checkBackendHealth();
+        setAttempt(index + 1);
+
+        await checkBackendHealth(timeoutMs);
 
         setStatus("ready");
         setHasChecked(true);
         setLastCheckedAt(Date.now());
 
-        setTimeout(() => {
+        window.setTimeout(() => {
           setStatus("idle");
         }, 2500);
 
         return;
       } catch {
-        await sleep(delay);
+        if (index < wakeupAttempts.length - 1) {
+          await sleep(delayMs);
+        }
       }
     }
 
+    // Only runs after all attempts fail
     setStatus("failed");
     setHasChecked(true);
-    setLastCheckedAt(Date.now());
+
+    // Do not set lastCheckedAt on failure.
+    // This allows retry sooner instead of waiting 5 minutes.
   };
 
   useEffect(() => {
     const fiveMinutes = 5 * 60 * 1000;
 
     const recentlyChecked =
-      lastCheckedAt && Date.now() - lastCheckedAt < fiveMinutes;
+      lastCheckedAt !== null && Date.now() - lastCheckedAt < fiveMinutes;
 
     if (hasChecked && recentlyChecked) return;
 
@@ -99,9 +123,28 @@ export function BackendStatusAlert() {
                 <h3 className="text-sm font-semibold text-foreground">
                   Waking up server
                 </h3>
+
                 <p className="mt-1 text-sm text-muted-foreground">
-                  The backend may take a few seconds to start.
+                  Free backend is starting. First load can take 30–60 seconds.
                 </p>
+
+                <div className="mt-3">
+                  <div className="mb-1 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Checking API</span>
+                    <span>
+                      Attempt {attempt}/{wakeupAttempts.length}
+                    </span>
+                  </div>
+
+                  <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-500"
+                      style={{
+                        width: `${(attempt / wakeupAttempts.length) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
               </>
             )}
 
@@ -110,6 +153,7 @@ export function BackendStatusAlert() {
                 <h3 className="text-sm font-semibold text-foreground">
                   Server is ready
                 </h3>
+
                 <p className="mt-1 text-sm text-muted-foreground">
                   API connection is active now.
                 </p>
@@ -121,6 +165,7 @@ export function BackendStatusAlert() {
                 <h3 className="text-sm font-semibold text-foreground">
                   Server not responding
                 </h3>
+
                 <p className="mt-1 text-sm text-muted-foreground">
                   Backend may still be starting. Try again in a moment.
                 </p>

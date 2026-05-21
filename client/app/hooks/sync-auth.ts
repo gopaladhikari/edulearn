@@ -1,5 +1,4 @@
 import { useEffect, useEffectEvent, useRef } from "react";
-import { isAxiosError } from "axios";
 import { useUserStore } from "~/store/userStore";
 import { api } from "~/lib/axios";
 import type { User } from "../../types/user.t";

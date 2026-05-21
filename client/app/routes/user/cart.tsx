@@ -36,8 +36,7 @@ const mockCart: CartItem[] = [
 export function meta() {
   return [
     {
-      name: "title",
-      content: "Shopping Cart - Edulearn",
+      title: "Shopping Cart - Edulearn",
     },
     {
       name: "description",

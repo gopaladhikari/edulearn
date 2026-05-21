@@ -6,7 +6,7 @@ const baseURL = import.meta.env.DEV ? "" : import.meta.env.VITE_API_URL;
 const api = axios.create({
   baseURL,
   withCredentials: true,
-  timeout: 5000, // 5 seconds
+  timeout: 4000, // 4 seconds
   timeoutErrorMessage: "Request timed out",
 });
 

@@ -3,6 +3,19 @@ import { Card } from "~/components/ui/card";
 import { Award, Users, Target, Lightbulb, Zap, Globe } from "lucide-react";
 import { Link } from "react-router";
 
+export function meta() {
+  return [
+    {
+      title: "About - Edulearn",
+    },
+    {
+      name: "description",
+      content:
+        "Learn how to build an about page with Next.js and Tailwind CSS.",
+    },
+  ];
+}
+
 export default function AboutPage() {
   const stats = [
     { icon: Users, label: "Active Learners", value: "500K+" },

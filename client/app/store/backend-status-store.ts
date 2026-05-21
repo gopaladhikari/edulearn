@@ -10,7 +10,7 @@ type BackendStatusState = {
 
   setStatus: (status: BackendStatus) => void;
   setHasChecked: (value: boolean) => void;
-  setLastCheckedAt: (time: number) => void;
+  setLastCheckedAt: (time: number | null) => void;
   reset: () => void;
 };
 
@@ -36,6 +36,7 @@ export const useBackendStatusStore = create<BackendStatusState>()(
       name: "backend-status",
       storage: createJSONStorage(() => sessionStorage),
 
+      // Persist only check history, not temporary UI status
       partialize: (state) => ({
         hasChecked: state.hasChecked,
         lastCheckedAt: state.lastCheckedAt,
