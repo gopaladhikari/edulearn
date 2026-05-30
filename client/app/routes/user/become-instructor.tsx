@@ -12,27 +12,63 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { Card } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
+
+import {
+  Form,
+  useActionData,
+  useSubmit,
+  type ActionFunction,
+} from "react-router";
+import type { ApiError, ApiSuccess } from "../../../types/axios.t";
+import { api } from "~/lib/axios";
+import { handleActionError } from "~/lib/utils";
 import {
   instructorApplicationSchema,
   type InstructorApplicationFormValues,
-} from "~/schemas/user.schema";
+} from "~/schemas/instructor-application.schema";
+
+export function meta() {
+  return [
+    { title: "Become Instructor - Edulearn" },
+    { name: "description", content: "Become an Instructor on Edulearn" },
+  ];
+}
+
+export const clientAction: ActionFunction = async ({ request }) => {
+  try {
+    const formData = await request.formData();
+
+    const stringyFormData = Object.fromEntries(formData);
+
+    const newFormData = {
+      ...stringyFormData,
+      expertise: (stringyFormData.expertise as string).split(","),
+      experienceYears: Number(stringyFormData.experienceYears),
+    };
+
+    console.log("newFormData:", newFormData);
+
+    const result = await api.post(
+      "/api/v1/instructor-application",
+      newFormData
+    );
+
+    return result.data;
+  } catch (error) {
+    return handleActionError(error);
+  }
+};
 
 export default function BecomeInstructorPage() {
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [currentExpertise, setCurrentExpertise] = useState("");
   const [expertise, setExpertise] = useState<string[]>([]);
 
+  const actionData = useActionData<ApiError | ApiSuccess>();
+
+  const submit = useSubmit();
+
   const form = useForm<InstructorApplicationFormValues>({
     resolver: zodResolver(instructorApplicationSchema),
-    defaultValues: {
-      motivation: "",
-      experienceYears: 0,
-      expertise: [],
-      qualification: "",
-      youtubeUrl: "",
-      linkedinUrl: "",
-      websiteUrl: "",
-    },
   });
 
   const addExpertise = () => {
@@ -42,6 +78,7 @@ export default function BecomeInstructorPage() {
     ) {
       const newExpertise = [...expertise, currentExpertise.trim()];
       setExpertise(newExpertise);
+      form.setValue("expertise", newExpertise);
       setCurrentExpertise("");
     }
   };
@@ -50,13 +87,13 @@ export default function BecomeInstructorPage() {
     setExpertise(expertise.filter((e) => e !== value));
   };
 
-  const onSubmit = (data: InstructorApplicationFormValues) => {
+  const onSubmit = async (data: InstructorApplicationFormValues) => {
     const finalData = { ...data, expertise };
-    console.log("Instructor application:", finalData);
-    setIsSubmitted(true);
+
+    await submit(finalData, { method: "post" });
   };
 
-  if (isSubmitted) {
+  if (actionData?.success === true) {
     return (
       <>
         <section className="bg-linear-to-br from-primary/5 to-accent/5 px-4 py-12 sm:px-6 lg:px-8">
@@ -87,12 +124,6 @@ export default function BecomeInstructorPage() {
                 review your application and get back to you within 7-10 business
                 days.
               </p>
-              <Button
-                onClick={() => setIsSubmitted(false)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                Submit Another Application
-              </Button>
             </Card>
           </div>
         </section>
@@ -117,7 +148,7 @@ export default function BecomeInstructorPage() {
       <section className="px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <Card className="p-8">
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <Form onSubmit={form.handleSubmit(onSubmit)}>
               <FieldGroup className="space-y-8">
                 {/* Motivation Field */}
                 <Field>
@@ -155,6 +186,7 @@ export default function BecomeInstructorPage() {
                   <Input
                     id="experienceYears"
                     type="number"
+                    inputMode="numeric"
                     min="0"
                     max="30"
                     placeholder="0"
@@ -185,7 +217,8 @@ export default function BecomeInstructorPage() {
                       placeholder="e.g., Web Development, Python, Machine Learning"
                       value={currentExpertise}
                       onChange={(e) => setCurrentExpertise(e.target.value)}
-                      onKeyPress={(e) => {
+                      aria-invalid={!!form.formState.errors.expertise}
+                      onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
                           addExpertise();
@@ -219,11 +252,6 @@ export default function BecomeInstructorPage() {
                         </div>
                       ))}
                     </div>
-                  )}
-                  {expertise.length === 0 && (
-                    <p className="mt-2 text-sm text-destructive">
-                      At least one area of expertise is required
-                    </p>
                   )}
                 </Field>
 
@@ -265,12 +293,12 @@ export default function BecomeInstructorPage() {
                         id="youtubeUrl"
                         type="url"
                         placeholder="https://youtube.com/..."
-                        {...form.register("youtubeUrl")}
-                        aria-invalid={!!form.formState.errors.youtubeUrl}
+                        {...form.register("youtube")}
+                        aria-invalid={!!form.formState.errors.youtube}
                       />
-                      {form.formState.errors.youtubeUrl && (
+                      {form.formState.errors.youtube && (
                         <p className="mt-2 text-sm text-destructive">
-                          {form.formState.errors.youtubeUrl.message}
+                          {form.formState.errors.youtube?.message}
                         </p>
                       )}
                     </Field>
@@ -284,12 +312,12 @@ export default function BecomeInstructorPage() {
                         id="linkedinUrl"
                         type="url"
                         placeholder="https://linkedin.com/in/..."
-                        {...form.register("linkedinUrl")}
-                        aria-invalid={!!form.formState.errors.linkedinUrl}
+                        {...form.register("linkedin")}
+                        aria-invalid={!!form.formState.errors.linkedin}
                       />
-                      {form.formState.errors.linkedinUrl && (
+                      {form.formState.errors.linkedin && (
                         <p className="mt-2 text-sm text-destructive">
-                          {form.formState.errors.linkedinUrl.message}
+                          {form.formState.errors.linkedin.message}
                         </p>
                       )}
                     </Field>
@@ -303,26 +331,30 @@ export default function BecomeInstructorPage() {
                         id="websiteUrl"
                         type="url"
                         placeholder="https://yourwebsite.com"
-                        {...form.register("websiteUrl")}
-                        aria-invalid={!!form.formState.errors.websiteUrl}
+                        {...form.register("website")}
+                        aria-invalid={!!form.formState.errors.linkedin}
                       />
-                      {form.formState.errors.websiteUrl && (
+                      {form.formState.errors.linkedin && (
                         <p className="mt-2 text-sm text-destructive">
-                          {form.formState.errors.websiteUrl.message}
+                          {form.formState.errors.linkedin.message}
                         </p>
                       )}
                     </Field>
                   </div>
                 </div>
 
+                {actionData?.success === false && (
+                  <p className="mt-1 text-sm text-destructive">
+                    {actionData.message}
+                  </p>
+                )}
+
                 {/* Submit Button */}
                 <div className="border-t pt-8">
                   <Button
                     type="submit"
                     className="w-full bg-primary py-6 text-primary-foreground hover:bg-primary/90"
-                    disabled={
-                      form.formState.isSubmitting || expertise.length === 0
-                    }
+                    disabled={form.formState.isSubmitting}
                   >
                     {form.formState.isSubmitting
                       ? "Submitting..."
@@ -330,7 +362,7 @@ export default function BecomeInstructorPage() {
                   </Button>
                 </div>
               </FieldGroup>
-            </form>
+            </Form>
           </Card>
         </div>
       </section>

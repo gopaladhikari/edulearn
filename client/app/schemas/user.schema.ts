@@ -57,40 +57,6 @@ export const resendEmailVerificationSchema = z.object({
   email,
 });
 
-export const instructorApplicationSchema = z.object({
-  motivation: z
-    .string()
-    .min(10, "Motivation must be at least 10 characters")
-    .max(800, "Motivation cannot exceed 800 characters"),
-  experienceYears: z
-    .number()
-    .min(0, "Experience cannot be negative")
-    .max(30, "Experience must be less than 30 years"),
-  expertise: z
-    .array(z.string())
-    .min(1, "At least one area of expertise is required"),
-  qualification: z
-    .string()
-    .min(5, "Qualification must be at least 5 characters")
-    .max(200, "Qualification cannot exceed 200 characters"),
-  youtubeUrl: z
-    .url("Please enter a valid YouTube URL")
-    .optional()
-    .or(z.literal("")),
-  linkedinUrl: z
-    .url("Please enter a valid LinkedIn URL")
-    .optional()
-    .or(z.literal("")),
-  websiteUrl: z
-    .url("Please enter a valid website URL")
-    .optional()
-    .or(z.literal("")),
-});
-
-export type InstructorApplicationFormValues = z.infer<
-  typeof instructorApplicationSchema
->;
-
 export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 export type LoginSchema = z.infer<typeof loginSchema>;
 export type RegisterSchema = z.infer<typeof registerSchema>;

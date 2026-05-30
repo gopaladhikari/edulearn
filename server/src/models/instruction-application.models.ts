@@ -8,13 +8,13 @@ const instructorApplicationSchema = new Schema<InstructorDetails>(
       type: Types.ObjectId,
       ref: "User",
       required: [true, "User is required."],
-      unique: true,
     },
 
     motivation: {
       type: String,
       required: [true, "Motivation is required."],
       maxlength: [800, "Motivation cannot exceed 800 characters"],
+      minlength: [200, "Motivation must be at least 200 characters"],
     },
 
     experienceYears: {

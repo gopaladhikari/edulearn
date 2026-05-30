@@ -5,6 +5,7 @@ import { Card } from "~/components/ui/card";
 import { api } from "~/lib/axios";
 import { cn } from "~/lib/utils";
 import { useBackendStatusStore } from "~/store/backend-status-store";
+import { getCurrentUser } from "~/lib/get-current-user";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -52,6 +53,8 @@ export function BackendStatusAlert() {
         setAttempt(index + 1);
 
         await checkBackendHealth(timeoutMs);
+
+        await getCurrentUser();
 
         setStatus("ready");
         setHasChecked(true);

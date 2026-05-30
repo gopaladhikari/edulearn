@@ -19,11 +19,10 @@ export const JwtStrategy = (passport: PassportStatic) => {
       try {
         const user = await User.findById(jwt_payload._id);
 
-        if (!user)
-          return done(null, false, { message: "Invalid email or password." });
+        if (!user) return done(new Error("Invalid email or password."), false);
 
         if (!user.isEmailVerified)
-          return done(null, false, { message: "Email not verified." });
+          return done(new Error("Email is not verified."), false);
 
         done(null, user);
       } catch (error) {

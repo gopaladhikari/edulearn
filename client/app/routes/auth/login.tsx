@@ -185,6 +185,22 @@ export default function Login() {
           >
             Login as a student
           </Button>
+          {/* <Button
+            type="button"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "w-full text-black"
+            )}
+            disabled={isSubmitting}
+            onClick={() => {
+              onSubmit({
+                email: "admin@edulearn.com",
+                password: "Admin@123",
+              });
+            }}
+          >
+            Login as a Admin
+          </Button> */}
         </Form>
 
         {/* Divider */}
