@@ -1,3 +1,4 @@
+import { instructorApplicationStatus } from "@/utils/constants.js";
 import { z } from "zod";
 
 export const instructorApplicationSchema = z.object({
@@ -9,3 +10,23 @@ export const instructorApplicationSchema = z.object({
   linkedin: z.url().optional().or(z.literal("")),
   website: z.url().optional().or(z.literal("")),
 });
+
+export const updateInstructorApplicationSchema = z
+  .object({
+    status: z.enum([
+      instructorApplicationStatus.REJECTED,
+      instructorApplicationStatus.ACCEPTED,
+    ]),
+    rejectionReason: z.string().min(1).max(500).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.status === instructorApplicationStatus.REJECTED)
+        return !!data.rejectionReason;
+      return true;
+    },
+    {
+      message: "Rejection reason is required.",
+      path: ["rejectionReason"],
+    }
+  );
