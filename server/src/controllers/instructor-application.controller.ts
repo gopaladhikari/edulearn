@@ -27,7 +27,7 @@ export const getAllInstructorApplication = async (
   );
 };
 
-export const getInstructorApplications = async (
+export const getInstructorApplicationsbByStudentId = async (
   req: Request,
   res: Response
 ) => {
@@ -45,6 +45,28 @@ export const getInstructorApplications = async (
   return res.status(200).json(
     new ApiResponse(200, "Instructor applications fetched successfully", {
       instructorApplications,
+    })
+  );
+};
+
+export const getInstructorApplicationById = async (
+  req: Request,
+  res: Response
+) => {
+  const applicationId = req.params.applicationId as string;
+
+  if (!isValidObjectId(applicationId))
+    throw new ApiError(400, "Invalid application id");
+
+  const instructorApplication =
+    await InstructorApplication.findById(applicationId);
+
+  if (!instructorApplication)
+    throw new ApiError(404, "Instructor application not found");
+
+  return res.status(200).json(
+    new ApiResponse(200, "Instructor application fetched successfully", {
+      instructorApplication,
     })
   );
 };

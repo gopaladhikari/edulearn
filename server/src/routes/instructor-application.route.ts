@@ -1,9 +1,10 @@
 import {
   createInstructorApplication,
   deleteInstructorApplication,
-  getInstructorApplications,
   updateInstructorApplication,
   getAllInstructorApplication,
+  getInstructorApplicationById,
+  getInstructorApplicationsbByStudentId,
 } from "@/controllers/instructor-application.controller.js";
 import { rbac } from "@/middlewares/rbac.middleware.js";
 import { validateRequest } from "@/middlewares/validator.middleware.js";
@@ -23,6 +24,7 @@ instructorApplicationRouter.use(verifyJwt);
 
 instructorApplicationRouter
   .route("/")
+  .get(rbac([UserRoles.ADMIN]), getAllInstructorApplication)
   .post(
     rbac([UserRoles.STUDENT]),
     validateRequest({ body: instructorApplicationSchema }),
@@ -30,15 +32,12 @@ instructorApplicationRouter
   );
 
 instructorApplicationRouter
-  .route("/")
-  .get(rbac([UserRoles.ADMIN]), getAllInstructorApplication);
-
-instructorApplicationRouter
-  .route("/:studentId")
-  .get(rbac([UserRoles.ADMIN]), getInstructorApplications);
+  .route("/student/:studentId")
+  .get(rbac([UserRoles.ADMIN]), getInstructorApplicationsbByStudentId);
 
 instructorApplicationRouter
   .route("/:applicationId")
+  .get(rbac([UserRoles.ADMIN]), getInstructorApplicationById)
   .patch(
     rbac([UserRoles.ADMIN]),
     validateRequest({ body: updateInstructorApplicationSchema }),

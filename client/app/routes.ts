@@ -33,6 +33,10 @@ export default [
       "/admin/instructor-applications",
       "routes/admin/instructor-applications.tsx"
     ),
+    route(
+      "/admin/instructor-applications/:applicationId",
+      "routes/admin/instructor-application.tsx"
+    ),
   ]),
 
   // Public routes

@@ -9,9 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function handleActionError(error: unknown) {
-  console.log(error);
   if (isAxiosError(error)) {
-    console.log(error.response?.data);
     return data(error.response?.data, {
       status: error.response?.status || 500,
     });

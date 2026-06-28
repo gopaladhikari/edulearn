@@ -58,8 +58,6 @@ export default function ForgotPassword() {
 
   const actionData = useActionData<ApiError | ApiSuccess>();
 
-  console.log({ actionData });
-
   const isSubmitting = navigator.state === "submitting";
 
   const onSubmit: SubmitHandler<ForgotPasswordSchema> = (data) => {

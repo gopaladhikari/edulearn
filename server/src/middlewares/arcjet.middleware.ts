@@ -50,7 +50,7 @@ const signUpProtection = arcjet({
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
   rules: [
-    shield({ mode: "LIVE" }),
+    shield({ mode: "DRY_RUN" }),
 
     detectBot({
       mode: "DRY_RUN",
