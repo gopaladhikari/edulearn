@@ -10,6 +10,23 @@ import type { Request, Response } from "express";
 import type { Content } from "mailgen";
 import { isValidObjectId } from "mongoose";
 
+export const getAllInstructorApplication = async (
+  _req: Request,
+  res: Response
+) => {
+  const instructorApplications =
+    await InstructorApplication.find().populate("user");
+
+  if (instructorApplications && instructorApplications.length === 0)
+    throw new ApiError(404, "No instructor applications found");
+
+  return res.status(200).json(
+    new ApiResponse(200, "Instructor applications fetched successfully", {
+      instructorApplications,
+    })
+  );
+};
+
 export const getInstructorApplications = async (
   req: Request,
   res: Response

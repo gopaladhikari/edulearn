@@ -11,7 +11,7 @@ export const getCurrentUser = async () => {
     const { data } = await api.get<Result>("/api/v1/user/current-user");
     useUserStore.getState().setUser(data.data.user);
     return data.data.user;
-  } catch (error) {
+  } catch {
     useUserStore.getState().logout();
   }
 };

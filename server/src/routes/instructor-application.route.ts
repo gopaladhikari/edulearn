@@ -3,6 +3,7 @@ import {
   deleteInstructorApplication,
   getInstructorApplications,
   updateInstructorApplication,
+  getAllInstructorApplication,
 } from "@/controllers/instructor-application.controller.js";
 import { rbac } from "@/middlewares/rbac.middleware.js";
 import { validateRequest } from "@/middlewares/validator.middleware.js";
@@ -27,6 +28,10 @@ instructorApplicationRouter
     validateRequest({ body: instructorApplicationSchema }),
     createInstructorApplication
   );
+
+instructorApplicationRouter
+  .route("/")
+  .get(rbac([UserRoles.ADMIN]), getAllInstructorApplication);
 
 instructorApplicationRouter
   .route("/:studentId")

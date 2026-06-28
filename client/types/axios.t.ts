@@ -1,6 +1,6 @@
 import "axios";
 
-export type ApiSuccess<T = any> = {
+export type ApiSuccess<T = unknown> = {
   status: number;
   success: true;
   message: string;
@@ -15,36 +15,36 @@ export type ApiError = {
 };
 
 declare module "axios" {
-  export interface CustomResponse<T = any> extends AxiosResponse {
+  export interface CustomResponse<T = unknown> extends AxiosResponse {
     data: ApiSuccess<T>;
   }
 
   export interface AxiosInstance {
-    get<T = any, R = CustomResponse<T>>(
+    get<T = unknown, R = CustomResponse<T>>(
       url: string,
       config?: AxiosRequestConfig
     ): Promise<R>;
 
-    post<T = any, R = CustomResponse<T>>(
+    post<T = unknown, R = CustomResponse<T>>(
       url: string,
-      data?: any,
+      data?: unknown,
       config?: AxiosRequestConfig
     ): Promise<R>;
 
-    patch<T = any, R = CustomResponse<T>>(
+    patch<T = unknown, R = CustomResponse<T>>(
       url: string,
-      data?: any,
+      data?: unknown,
       config?: AxiosRequestConfig
     ): Promise<R>;
 
-    delete<T = any, R = CustomResponse<T>>(
+    delete<T = unknown, R = CustomResponse<T>>(
       url: string,
       config?: AxiosRequestConfig
     ): Promise<R>;
 
-    put<T = any, R = CustomResponse<T>>(
+    put<T = unknown, R = CustomResponse<T>>(
       url: string,
-      data?: any,
+      data?: unknown,
       config?: AxiosRequestConfig
     ): Promise<R>;
   }
