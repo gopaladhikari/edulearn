@@ -25,6 +25,16 @@ export default [
     route("/become-instructor", "routes/user/become-instructor.tsx"),
   ]),
 
+  layout("routes/admin/layout.tsx", [
+    route("/admin", "routes/admin/dashboard.tsx"),
+    route("/admin/courses", "routes/admin/courses.tsx"),
+    route("/admin/users", "routes/admin/users.tsx"),
+    route(
+      "/admin/instructor-applications",
+      "routes/admin/instructor-applications.tsx"
+    ),
+  ]),
+
   // Public routes
   route("/contact-us", "routes/public/contact-us.tsx"),
   route("/terms-and-conditions", "routes/public/terms-and-conditions.tsx"),

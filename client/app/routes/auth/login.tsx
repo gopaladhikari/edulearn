@@ -185,7 +185,7 @@ export default function Login() {
           >
             Login as a student
           </Button>
-          {/* <Button
+          <Button
             type="button"
             className={cn(
               buttonVariants({ variant: "outline" }),
@@ -200,7 +200,7 @@ export default function Login() {
             }}
           >
             Login as a Admin
-          </Button> */}
+          </Button>
         </Form>
 
         {/* Divider */}
