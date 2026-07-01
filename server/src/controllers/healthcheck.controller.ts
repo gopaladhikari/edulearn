@@ -1,6 +1,7 @@
 import { ApiResponse } from "@/utils/api-responses.js";
 import type { Response, Request } from "express";
 import { dbConnection } from "@/utils/connect-to-db.js";
+import { redis } from "@/utils/redis.js";
 
 const getReadyStatus = (number: number) => {
   switch (number) {
@@ -17,8 +18,10 @@ const getReadyStatus = (number: number) => {
   }
 };
 
-export const healthCheck = (_req: Request, res: Response) => {
+export const healthCheck = async (_req: Request, res: Response) => {
   const dbStatus = dbConnection.getConnectionStatus();
+
+  const pong = await redis.ping();
 
   const healthStatus = {
     status: "Ok",
@@ -35,6 +38,14 @@ export const healthCheck = (_req: Request, res: Response) => {
         status: "Ok",
         uptime: process.uptime(),
         memoryUsage: process.memoryUsage(),
+      },
+
+      redis: {
+        status: pong === "PONG" ? "Connected" : "Disconnected",
+        message:
+          pong === "PONG"
+            ? "Redis is very connected."
+            : "Redis is disconnected",
       },
     },
   };

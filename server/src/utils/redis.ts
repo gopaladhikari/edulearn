@@ -13,8 +13,6 @@ redis.on("connect", () => {
   console.log("Redis connected");
 });
 
-redis.on("error", (error) => {
-  console.error("Redis error:", error.message);
-});
+redis.on("error", console.error);
 
 export { redis };

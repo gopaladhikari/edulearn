@@ -5,4 +5,6 @@ const healthCheckRouter = Router();
 
 healthCheckRouter.route("/").get(healthCheck);
 
+healthCheckRouter.route("/redis").get(healthCheck);
+
 export { healthCheckRouter };

@@ -33,7 +33,7 @@ const signUpProtection = arcjet({
       },
 
       bots: {
-        mode: "DRY_RUN",
+        mode: "LIVE",
         allow: ["POSTMAN"],
       },
 
@@ -50,10 +50,10 @@ const signUpProtection = arcjet({
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
   rules: [
-    shield({ mode: "DRY_RUN" }),
+    shield({ mode: "LIVE" }),
 
     detectBot({
-      mode: "DRY_RUN",
+      mode: "LIVE",
       allow: ["CATEGORY:SEARCH_ENGINE", "POSTMAN"],
     }),
 
@@ -69,6 +69,7 @@ const aj = arcjet({
       mode: "LIVE",
       interval: 60,
       max: 100,
+      characteristics: ["ip"],
     }),
   ],
 });
@@ -106,6 +107,13 @@ export const arcjectProtection = async (
   next: NextFunction
 ) => {
   const ip = findIp(req) || getClientIp(req) || "127.0.0.1";
+
+  console.log({
+    arcjetIp: ip,
+    expressIp: req.ip,
+    forwarded: req.headers["x-forwarded-for"],
+    remote: req.socket.remoteAddress,
+  });
 
   const decision = await aj.protect(req, { requested: 1, ip });
 
