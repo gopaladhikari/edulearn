@@ -8,8 +8,10 @@ function courseKey(id: string) {
   return `course:${id}`;
 }
 
-export const getCourses = async (req: Request, res: Response) => {
+export const getCourses = async (_req: Request, res: Response) => {
   const courses = await Course.aggregate([]);
+
+  res.json(courses);
 };
 
 export const getCourseById = async (req: Request, res: Response) => {

@@ -43,9 +43,7 @@ export const healthCheck = async (_req: Request, res: Response) => {
       redis: {
         status: pong === "PONG" ? "Connected" : "Disconnected",
         message:
-          pong === "PONG"
-            ? "Redis is very connected."
-            : "Redis is disconnected",
+          pong === "PONG" ? "Redis is connected." : "Redis is disconnected",
       },
     },
   };
