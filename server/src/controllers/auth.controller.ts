@@ -63,7 +63,7 @@ export const registerUser = async (req: Request, res: Response) => {
     })
   );
 
-  sendEmail(user.email, "Verify your email", content).then((result) => {
+  void sendEmail(user.email, "Verify your email", content).then((result) => {
     console.log(result);
   });
 };
@@ -140,7 +140,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
   const content = welcomeEmailTemplate(user.username);
 
-  sendEmail(user.email, "Welcome to Edulearn", content).then((result) => {
+  void sendEmail(user.email, "Welcome to Edulearn", content).then((result) => {
     console.log(result);
   });
 };
@@ -168,7 +168,7 @@ export const resendEmailVerification = async (req: Request, res: Response) => {
     `${clientUrl}/verify-email?token=${unhashedToken}`
   );
 
-  sendEmail(user.email, "Verify your email", content).then((result) => {
+  void sendEmail(user.email, "Verify your email", content).then((result) => {
     console.log(result);
   });
 };
@@ -228,7 +228,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     `${clientUrl}/reset-password/${unhashedToken}`
   );
 
-  sendEmail(user.email, "Reset your password", content).then((result) => {
+  void sendEmail(user.email, "Reset your password", content).then((result) => {
     console.log(result);
   });
 };

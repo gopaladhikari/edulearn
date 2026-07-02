@@ -5,20 +5,43 @@ import {
 import { InstructorApplication } from "@/models/instruction-application.models.js";
 import { ApiError, ApiResponse } from "@/utils/api-responses.js";
 import { instructorApplicationStatus } from "@/utils/constants.js";
+import { cache } from "@/utils/redis.js";
 import { sendEmail } from "@/utils/send-email.js";
 import type { Request, Response } from "express";
 import type { Content } from "mailgen";
 import { isValidObjectId } from "mongoose";
 
+const CACHE_TTL = 60 * 60; // 1 hour
+
+function getKey(key: string): string {
+  return `instructor-application:${key}`;
+}
+
 export const getAllInstructorApplication = async (
   _req: Request,
   res: Response
 ) => {
+  const cachedApplications = await cache.get(getKey("all"));
+
+  if (cachedApplications) {
+    return res.status(200).json(
+      new ApiResponse(200, "Instructor applications fetched successfully", {
+        instructorApplications: cachedApplications,
+      })
+    );
+  }
+
   const instructorApplications =
     await InstructorApplication.find().populate("user");
 
   if (instructorApplications && instructorApplications.length === 0)
     throw new ApiError(404, "No instructor applications found");
+
+  void cache.set(
+    getKey("all"),
+    JSON.stringify(instructorApplications),
+    CACHE_TTL
+  );
 
   return res.status(200).json(
     new ApiResponse(200, "Instructor applications fetched successfully", {
@@ -36,11 +59,28 @@ export const getInstructorApplicationsbByStudentId = async (
   if (!isValidObjectId(studentId))
     throw new ApiError(400, "Invalid student id");
 
+  const cachedApplications = await cache.get(getKey(studentId));
+
+  if (cachedApplications) {
+    return res.status(200).json(
+      new ApiResponse(200, "Instructor applications fetched successfully", {
+        instructorApplications: cachedApplications,
+      })
+    );
+  }
+
   const instructorApplications = await InstructorApplication.find({
     user: studentId,
   });
 
-  if (!instructorApplications) throw new ApiError(500, "Something went wrong");
+  if (instructorApplications.length === 0)
+    throw new ApiError(404, "No instructor applications found");
+
+  void cache.set(
+    getKey(studentId),
+    JSON.stringify(instructorApplications),
+    CACHE_TTL
+  );
 
   return res.status(200).json(
     new ApiResponse(200, "Instructor applications fetched successfully", {
@@ -58,11 +98,27 @@ export const getInstructorApplicationById = async (
   if (!isValidObjectId(applicationId))
     throw new ApiError(400, "Invalid application id");
 
+  const cachedApplication = await cache.get(getKey(applicationId));
+
+  if (cachedApplication) {
+    return res.status(200).json(
+      new ApiResponse(200, "Instructor application fetched successfully", {
+        instructorApplication: cachedApplication,
+      })
+    );
+  }
+
   const instructorApplication =
     await InstructorApplication.findById(applicationId);
 
   if (!instructorApplication)
     throw new ApiError(404, "Instructor application not found");
+
+  void cache.set(
+    getKey(applicationId),
+    JSON.stringify(instructorApplication),
+    CACHE_TTL
+  );
 
   return res.status(200).json(
     new ApiResponse(200, "Instructor application fetched successfully", {
@@ -102,6 +158,8 @@ export const createInstructorApplication = async (
 
   if (!instructorApplication) throw new ApiError(500, "Something went wrong");
 
+  void cache.del(getKey("all"));
+
   return res.status(201).json(
     new ApiResponse(201, "Instructor application created successfully", {
       instructorApplication,
@@ -140,6 +198,12 @@ export const updateInstructorApplication = async (
 
   await instructorApplication.save();
 
+  void Promise.all([
+    cache.del(getKey(applicationId)),
+    cache.del(getKey("all")),
+    cache.del(instructorApplication.user._id.toString()),
+  ]);
+
   res
     .status(200)
     .json(
@@ -159,7 +223,7 @@ export const updateInstructorApplication = async (
     emailBody = instructorRejectedTemplate(applicant.username, rejectionReason);
   }
 
-  sendEmail(applicant.email, emailSubject, emailBody);
+  void sendEmail(applicant.email, emailSubject, emailBody);
 };
 
 export const deleteInstructorApplication = async (
@@ -176,6 +240,12 @@ export const deleteInstructorApplication = async (
 
   if (!instructorApplication)
     throw new ApiError(404, "Instructor application not found");
+
+  void Promise.all([
+    cache.del(getKey(applicationId)),
+    cache.del(getKey("all")),
+    cache.del(instructorApplication.user._id.toString()),
+  ]);
 
   return res.status(200).json(
     new ApiResponse(200, "Instructor application deleted successfully", {
