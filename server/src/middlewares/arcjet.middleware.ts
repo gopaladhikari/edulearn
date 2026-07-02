@@ -108,13 +108,6 @@ export const arcjectProtection = async (
 ) => {
   const ip = findIp(req) || getClientIp(req) || "127.0.0.1";
 
-  console.log({
-    arcjetIp: ip,
-    expressIp: req.ip,
-    forwarded: req.headers["x-forwarded-for"],
-    remote: req.socket.remoteAddress,
-  });
-
   const decision = await aj.protect(req, { requested: 1, ip });
 
   handleDecision(decision);

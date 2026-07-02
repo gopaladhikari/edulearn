@@ -14,5 +14,3 @@ dbConnection
     console.error("Database connection failed");
     process.exit(1);
   });
-
-// TODO: Add CourseReview, rating, Wishlist, Cart, Certificate, Notification

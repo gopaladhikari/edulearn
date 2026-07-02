@@ -46,8 +46,6 @@ export const clientAction: ActionFunction = async ({ request }) => {
       experienceYears: Number(stringyFormData.experienceYears),
     };
 
-    console.log("newFormData:", newFormData);
-
     const result = await api.post(
       "/api/v1/instructor-application",
       newFormData

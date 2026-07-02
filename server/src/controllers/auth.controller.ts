@@ -63,9 +63,7 @@ export const registerUser = async (req: Request, res: Response) => {
     })
   );
 
-  void sendEmail(user.email, "Verify your email", content).then((result) => {
-    console.log(result);
-  });
+  void sendEmail(user.email, "Verify your email", content);
 };
 
 export const loginUser = async (req: Request, res: Response) => {
@@ -140,9 +138,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
   const content = welcomeEmailTemplate(user.username);
 
-  void sendEmail(user.email, "Welcome to Edulearn", content).then((result) => {
-    console.log(result);
-  });
+  void sendEmail(user.email, "Welcome to Edulearn", content);
 };
 
 export const resendEmailVerification = async (req: Request, res: Response) => {
@@ -168,9 +164,7 @@ export const resendEmailVerification = async (req: Request, res: Response) => {
     `${clientUrl}/verify-email?token=${unhashedToken}`
   );
 
-  void sendEmail(user.email, "Verify your email", content).then((result) => {
-    console.log(result);
-  });
+  void sendEmail(user.email, "Verify your email", content);
 };
 
 export const refreshAccessToken = async (req: Request, res: Response) => {
@@ -184,11 +178,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
     process.env.REFRESH_TOKEN_SECRET as string
   ) as jwt.JwtPayload;
 
-  console.log({ decodedToken });
-
   const user = await User.findById(decodedToken._id).select("+refreshToken");
-
-  console.log({ user });
 
   if (!user) throw new ApiError(400, "Invalid token");
 
@@ -228,9 +218,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
     `${clientUrl}/reset-password/${unhashedToken}`
   );
 
-  void sendEmail(user.email, "Reset your password", content).then((result) => {
-    console.log(result);
-  });
+  void sendEmail(user.email, "Reset your password", content);
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
